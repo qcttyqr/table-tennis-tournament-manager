@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Tennis Tournament Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>TTSASK MANAGER</h1>
+        <div class="tournament-status">
+            <span id="tourney-name">Unnamed Tournament</span> |
+            <span id="player-count">0 players</span> |
+            <span id="event-count">0 events</span>
+        </div>
+    </header>
+
+    <nav class="tab-bar">
+        <button class="tab-button active" data-tab="setup">Setup</button>
+        <button class="tab-button" data-tab="players">Players</button>
+        <button class="tab-button" data-tab="events">Events</button>
+        <button class="tab-button" data-tab="draw">Draw</button>
+        <button class="tab-button" data-tab="scores">Scores</button>
+        <button class="tab-button" data-tab="standings">Standings</button>
+        <button class="tab-button" data-tab="bracket">KO Bracket</button>
+        <button class="tab-button" data-tab="matches">Match Slips</button>
+        <button class="tab-button" data-tab="results">Results Sheet</button>
+    </nav>
+
+    <main>
+        <!-- SETUP TAB -->
+        <section id="setup-tab" class="tab-content active">
+            <h2>Tournament Setup</h2>
+            <div class="setup-card">
+                <h3>📌 Tournament Identity</h3>
+                <p><small>Preview — appears on match slips</small></p>
+                <input type="text" id="tourney-fullname" placeholder="Full Name (e.g., Canadian Open)">
+                <input type="text" id="tourney-shortname" placeholder="Short Name (e.g., CanOpen 2024)">
+                <input type="text" id="tourney-venue" placeholder="Venue">
+                <input type="text" id="tourney-year" placeholder="Year">
+            </div>
+            <div class="setup-card">
+                <h3>⚡ Quick Start Guide</h3>
+                <ol>
+                    <li>Fill in tournament info above</li>
+                    <li>Players tab → add players or import CSV</li>
+                    <li>Events tab → create events, assign players</li>
+                    <li>Draw tab → generate draw (TTCAN rules)</li>
+                    <li>Enter scores → standings auto-update (ITTF 3.7.5)</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- PLAYERS TAB -->
+        <section id="players-tab" class="tab-content">
+            <h2>Players</h2>
+            <button id="add-player-btn">➕ Add Player</button>
+            <button id="import-csv-btn">📂 Import CSV</button>
+            <div id="players-registry">
+                <p>👥 Registry <span id="registry-count">0</span> players</p>
+                <table id="players-table">
+                    <thead>
+                        <tr><th>Name</th><th>Rating</th><th>Team</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="players-list"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- EVENTS TAB -->
+        <section id="events-tab" class="tab-content">
+            <h2>Events</h2>
+            <button id="new-event-btn">➕ New Event</button>
+            <div id="events-list"></div>
+        </section>
+
+        <!-- DRAW TAB -->
+        <section id="draw-tab" class="tab-content">
+            <h2>Draw</h2>
+            <label for="draw-event-select">Select Event:</label>
+            <select id="draw-event-select"></select>
+            <button id="generate-draw-btn">🎯 Generate Draw</button>
+            <div id="draw-display"></div>
+        </section>
+
+        <!-- SCORES TAB -->
+        <section id="scores-tab" class="tab-content">
+            <h2>Scores</h2>
+            <label for="scores-event-select">Select Event:</label>
+            <select id="scores-event-select"></select>
+            <div id="scores-entry"></div>
+        </section>
+
+        <!-- STANDINGS TAB -->
+        <section id="standings-tab" class="tab-content">
+            <h2>Standings</h2>
+            <label for="standings-event-select">Select Event:</label>
+            <select id="standings-event-select"></select>
+            <div id="standings-display"></div>
+        </section>
+
+        <!-- KO BRACKET TAB -->
+        <section id="bracket-tab" class="tab-content">
+            <h2>KO Bracket</h2>
+            <label for="bracket-event-select">Select KO Event:</label>
+            <select id="bracket-event-select"></select>
+            <div id="bracket-display"></div>
+        </section>
+
+        <!-- MATCH SLIPS TAB -->
+        <section id="matches-tab" class="tab-content">
+            <h2>📋 Match Slips</h2>
+            <p>Shows nickname for referee announcements. Includes all 3 logos. Prints 2-up on letter paper.</p>
+            <button id="print-slips-btn">Print Match Slips</button>
+        </section>
+
+        <!-- RESULTS SHEET TAB -->
+        <section id="results-tab" class="tab-content">
+            <h2>📊 Results Sheet</h2>
+            <p>Legal names, rating, team. For TTCAN rating coordinator submission.</p>
+            <button id="export-results-btn">Export Results</button>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
