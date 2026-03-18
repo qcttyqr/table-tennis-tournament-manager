@@ -1006,61 +1006,68 @@ function openEventModal() {
   document.getElementById('ev-format').value = 'rr4';
   document.getElementById('ev-best').value = '5';
   document.getElementById('ev-error').textContent = '';
-  const list = document.getElementById('ev-player-list');
-  list.innerHTML = '';
-  [...state.players]
-    .sort((a,b) => (a.last||'').localeCompare(b.last||''))
-    .forEach(p => {
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.id = 'chk-p-' + p.id;
-      cb.dataset.pid = p.id;
-      cb.addEventListener('click', e => e.stopPropagation());
-      cb.addEventListener('change', updateSelCount);
-
-      const lbl = document.createElement('span');
-      lbl.textContent = (p.last || '') + (p.first ? ', ' + p.first : '') + (p.rating ? ' (' + p.rating + ')' : '');
-
-      const row = document.createElement('div');
-      row.className = 'player-check';
-      row.addEventListener('click', () => { cb.checked = !cb.checked; updateSelCount(); });
-      row.appendChild(cb);
-      row.appendChild(lbl);
-      list.appendChild(row);
-    });
+  buildPlayerChecklist();
   document.getElementById('ev-sel-count').textContent = '0';
   document.getElementById('event-modal').classList.add('open');
+}
+
+function buildPlayerChecklist() {
+  var list = document.getElementById('ev-player-list');
+  var sorted = state.players.slice().sort(function(a,b){ return (a.last||'').localeCompare(b.last||''); });
+  var html = '';
+  for (var i = 0; i < sorted.length; i++) {
+    var p = sorted[i];
+    var name = (p.last||'') + (p.first ? ', ' + p.first : '') + (p.rating ? ' (' + p.rating + ')' : '');
+    html += '<div class="player-check" onclick="togglePlayerCheck(' + p.id + ')">';
+    html += '<input type="checkbox" id="chk' + p.id + '">';
+    html += '<span>' + name + '</span>';
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+
+function togglePlayerCheck(pid) {
+  var cb = document.getElementById('chk' + pid);
+  if (cb) { cb.checked = !cb.checked; updateSelCount(); }
 }
 
 
 function closeEventModal() { document.getElementById('event-modal').classList.remove('open'); }
 
 function updateSelCount() {
-  const n = document.querySelectorAll('#ev-player-list input[type=checkbox]:checked').length;
+  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  var n = 0;
+  for (var i = 0; i < boxes.length; i++) { if (boxes[i].checked) n++; }
   document.getElementById('ev-sel-count').textContent = n;
 }
 function selectAllPlayers() {
-  document.querySelectorAll('#ev-player-list input[type=checkbox]').forEach(c=>c.checked=true);
+  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  for (var i = 0; i < boxes.length; i++) { boxes[i].checked = true; }
   updateSelCount();
 }
 function selectNonePlayers() {
-  document.querySelectorAll('#ev-player-list input[type=checkbox]').forEach(c=>c.checked=false);
+  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  for (var i = 0; i < boxes.length; i++) { boxes[i].checked = false; }
   updateSelCount();
 }
 
 function createEvent() {
-  const errEl = document.getElementById('ev-error');
+  var errEl = document.getElementById('ev-error');
   errEl.textContent = '';
-  const name = document.getElementById('ev-name').value.trim();
-  if (!name) { errEl.textContent = '⚠ Enter an event name.'; return; }
-  const checked = document.querySelectorAll('#ev-player-list input[type=checkbox]:checked');
-  const pIds = [...checked].map(c => parseInt(c.dataset.pid));
-  if (!pIds.length) { errEl.textContent = '⚠ Select at least one player.'; return; }
-  const ev = {
+  var name = document.getElementById('ev-name').value.trim();
+  if (!name) { errEl.textContent = 'Enter an event name.'; return; }
+  var pIds = [];
+  var sorted = state.players.slice().sort(function(a,b){ return (a.last||'').localeCompare(b.last||''); });
+  for (var i = 0; i < sorted.length; i++) {
+    var cb = document.getElementById('chk' + sorted[i].id);
+    if (cb && cb.checked) { pIds.push(sorted[i].id); }
+  }
+  if (!pIds.length) { errEl.textContent = 'Select at least one player.'; return; }
+  var ev = {
     id: nextEventId++,
-    name,
+    name: name,
     format: document.getElementById('ev-format').value,
-    best:   parseInt(document.getElementById('ev-best').value),
+    best: parseInt(document.getElementById('ev-best').value),
     playerIds: pIds,
     draw: null,
     scores: {}
