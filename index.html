@@ -1079,41 +1079,76 @@ function selectNonePlayers() {
 }
 
 function createEvent() {
+  console.log("Create Event clicked");
   var errEl = document.getElementById('ev-error');
   errEl.textContent = '';
+  
   var name = document.getElementById('ev-name').value.trim();
-  if (!name) { errEl.textContent = 'Enter an event name.'; return; }
+  console.log("Event name:", name);
+  
+  if (!name) { 
+    errEl.textContent = 'Enter an event name.'; 
+    return; 
+  }
   
   // Get all checkboxes and collect checked player IDs
   var pIds = [];
   var checkboxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  console.log("Found checkboxes:", checkboxes.length);
   
   for (var i = 0; i < checkboxes.length; i++) {
+    console.log("Checkbox", i, "checked:", checkboxes[i].checked, "id:", checkboxes[i].id);
     if (checkboxes[i].checked) {
-      // Extract the player ID from the checkbox id (removing 'chk' prefix)
       var pid = parseInt(checkboxes[i].id.replace('chk', ''));
+      console.log("Selected player ID:", pid);
       pIds.push(pid);
     }
   }
   
-  if (!pIds.length) { errEl.textContent = 'Select at least one player.'; return; }
+  console.log("Selected player IDs:", pIds);
+  
+  if (!pIds.length) { 
+    errEl.textContent = 'Select at least one player.'; 
+    return; 
+  }
+  
+  var format = document.getElementById('ev-format').value;
+  var best = parseInt(document.getElementById('ev-best').value);
+  console.log("Format:", format, "Best of:", best);
   
   var ev = {
     id: nextEventId++,
     name: name,
-    format: document.getElementById('ev-format').value,
-    best: parseInt(document.getElementById('ev-best').value),
+    format: format,
+    best: best,
     playerIds: pIds,
     draw: null,
     scores: {}
   };
   
+  console.log("Created event object:", ev);
+  console.log("Current events before push:", state.events.length);
+  
   state.events.push(ev);
-  closeEventModal(); 
-  save(); 
-  renderEvents(); 
-  renderStatusBar(); 
+  
+  console.log("Events after push:", state.events.length);
+  
+  function closeEventModal() { 
+  console.log("Closing modal");
+  document.getElementById('event-modal').classList.remove('open'); 
+  }
+  
+  save();
+  console.log("Saved to localStorage");
+  
+  renderEvents();
+  console.log("Rendered events");
+  
+  renderStatusBar();
   populateEventSelects();
+  
+  // Verify the event was added
+  console.log("Final events array:", state.events);
 }
 
 function renderEvents() {
@@ -1495,6 +1530,11 @@ function renderAll() {
 
 load();
 renderAll();
+
+console.log("Page loaded, checking elements:");
+console.log("Event modal element:", document.getElementById('event-modal'));
+console.log("Create Event button exists:", !!document.querySelector('.btn-primary[onclick="createEvent()"]')); 
 </script>
+
 </body>
 </html>
