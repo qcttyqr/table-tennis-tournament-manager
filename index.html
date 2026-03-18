@@ -745,7 +745,7 @@
     <div id="ev-error" style="color:var(--accent3);font-size:13px;margin-top:8px;min-height:18px"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="createNewEvent()">Create Event</button>
+      <button class="btn btn-primary" onclick="addNewEvent()">Create Event</button>
     </div>
   </div>
 </div>
@@ -1018,39 +1018,12 @@ function buildPlayerChecklist() {
   for (var i = 0; i < sorted.length; i++) {
     var p = sorted[i];
     var name = (p.last||'') + (p.first ? ', ' + p.first : '') + (p.rating ? ' (' + p.rating + ')' : '');
-    html += '<div class="player-check">';
-    html += '<input type="checkbox" id="chk' + p.id + '" onchange="updateSelCount()">';
-    html += '<span onclick="togglePlayerCheck(' + p.id + ')">' + name + '</span>';
+    html += '<div class="player-check" onclick="togglePlayerCheck(' + p.id + ')">';
+    html += '<input type="checkbox" id="chk' + p.id + '">';
+    html += '<span>' + name + '</span>';
     html += '</div>';
   }
   list.innerHTML = html;
-}
-
-function togglePlayerCheck(pid) {
-  var cb = document.getElementById('chk' + pid);
-  if (cb) { 
-    cb.checked = !cb.checked; 
-    updateSelCount(); 
-  }
-}
-
-function updateSelCount() {
-  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
-  var n = 0;
-  for (var i = 0; i < boxes.length; i++) { if (boxes[i].checked) n++; }
-  document.getElementById('ev-sel-count').textContent = n;
-}
-
-function selectAllPlayers() {
-  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
-  for (var i = 0; i < boxes.length; i++) { boxes[i].checked = true; }
-  updateSelCount();
-}
-
-function selectNonePlayers() {
-  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
-  for (var i = 0; i < boxes.length; i++) { boxes[i].checked = false; }
-  updateSelCount();
 }
 
 function togglePlayerCheck(pid) {
@@ -1078,54 +1051,29 @@ function selectNonePlayers() {
   updateSelCount();
 }
 
-function createNewEvent() {
-  console.log("Create New Event clicked");
+function addNewEvent() {
   var errEl = document.getElementById('ev-error');
   errEl.textContent = '';
-  
   var name = document.getElementById('ev-name').value.trim();
-  console.log("Event name:", name);
-  
-  if (!name) { 
-    errEl.textContent = 'Enter an event name.'; 
-    return; 
-  }
-  
-  // Get all checkboxes and collect checked player IDs
+  if (!name) { errEl.textContent = 'Enter an event name.'; return; }
   var pIds = [];
-  var checkboxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
-  
-  for (var i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i].checked) {
-      var pid = parseInt(checkboxes[i].id.replace('chk', ''));
-      pIds.push(pid);
-    }
+  var sorted = state.players.slice().sort(function(a,b){ return (a.last||'').localeCompare(b.last||''); });
+  for (var i = 0; i < sorted.length; i++) {
+    var cb = document.getElementById('chk' + sorted[i].id);
+    if (cb && cb.checked) { pIds.push(sorted[i].id); }
   }
-  
-  if (!pIds.length) { 
-    errEl.textContent = 'Select at least one player.'; 
-    return; 
-  }
-  
-  var format = document.getElementById('ev-format').value;
-  var best = parseInt(document.getElementById('ev-best').value);
-  
+  if (!pIds.length) { errEl.textContent = 'Select at least one player.'; return; }
   var ev = {
     id: nextEventId++,
     name: name,
-    format: format,
-    best: best,
+    format: document.getElementById('ev-format').value,
+    best: parseInt(document.getElementById('ev-best').value),
     playerIds: pIds,
     draw: null,
     scores: {}
   };
-  
   state.events.push(ev);
-  closeEventModal(); 
-  save(); 
-  renderEvents(); 
-  renderStatusBar(); 
-  populateEventSelects();
+  closeEventModal(); save(); renderEvents(); renderStatusBar(); populateEventSelects();
 }
 
 function renderEvents() {
@@ -1507,11 +1455,6 @@ function renderAll() {
 
 load();
 renderAll();
-
-console.log("Page loaded, checking elements:");
-console.log("Event modal element:", document.getElementById('event-modal'));
-console.log("Create Event button exists:", !!document.querySelector('.btn-primary[onclick="createEvent()"]')); 
 </script>
-
 </body>
 </html>
