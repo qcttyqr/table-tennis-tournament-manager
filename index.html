@@ -1011,14 +1011,9 @@ function openEventModal() {
   [...state.players]
     .sort((a,b) => (a.last||'').localeCompare(b.last||''))
     .forEach(p => {
-      const cid = 'chk-p-' + p.id;
-      const row = document.createElement('div');
-      row.className = 'player-check';
-      row.addEventListener('click', () => { cb.checked = !cb.checked; updateSelCount(); });
-
       const cb = document.createElement('input');
       cb.type = 'checkbox';
-      cb.id = cid;
+      cb.id = 'chk-p-' + p.id;
       cb.dataset.pid = p.id;
       cb.addEventListener('click', e => e.stopPropagation());
       cb.addEventListener('change', updateSelCount);
@@ -1026,6 +1021,9 @@ function openEventModal() {
       const lbl = document.createElement('span');
       lbl.textContent = (p.last || '') + (p.first ? ', ' + p.first : '') + (p.rating ? ' (' + p.rating + ')' : '');
 
+      const row = document.createElement('div');
+      row.className = 'player-check';
+      row.addEventListener('click', () => { cb.checked = !cb.checked; updateSelCount(); });
       row.appendChild(cb);
       row.appendChild(lbl);
       list.appendChild(row);
