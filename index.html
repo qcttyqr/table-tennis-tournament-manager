@@ -1007,24 +1007,33 @@ function openEventModal() {
   document.getElementById('ev-best').value = '5';
   document.getElementById('ev-error').textContent = '';
   const list = document.getElementById('ev-player-list');
-  list.innerHTML = [...state.players]
-    .sort((a,b)=>(a.last||'').localeCompare(b.last||''))
-    .map(p => {
+  list.innerHTML = '';
+  [...state.players]
+    .sort((a,b) => (a.last||'').localeCompare(b.last||''))
+    .forEach(p => {
       const cid = 'chk-p-' + p.id;
-      return `<div class="player-check" onclick="toggleCheck('${cid}')">
-        <input type="checkbox" id="${cid}" data-pid="${p.id}" onclick="event.stopPropagation();updateSelCount()">
-        <span>${p.last}${p.first?', '+p.first:''} ${p.rating?'<span style=\'color:var(--text-muted);font-size:12px\'>('+p.rating+')</span>':''}</span>
-      </div>`;
-    }).join('');
+      const row = document.createElement('div');
+      row.className = 'player-check';
+      row.addEventListener('click', () => { cb.checked = !cb.checked; updateSelCount(); });
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.id = cid;
+      cb.dataset.pid = p.id;
+      cb.addEventListener('click', e => e.stopPropagation());
+      cb.addEventListener('change', updateSelCount);
+
+      const lbl = document.createElement('span');
+      lbl.textContent = (p.last || '') + (p.first ? ', ' + p.first : '') + (p.rating ? ' (' + p.rating + ')' : '');
+
+      row.appendChild(cb);
+      row.appendChild(lbl);
+      list.appendChild(row);
+    });
   document.getElementById('ev-sel-count').textContent = '0';
   document.getElementById('event-modal').classList.add('open');
 }
 
-function toggleCheck(cid) {
-  const cb = document.getElementById(cid);
-  cb.checked = !cb.checked;
-  updateSelCount();
-}
 
 function closeEventModal() { document.getElementById('event-modal').classList.remove('open'); }
 
