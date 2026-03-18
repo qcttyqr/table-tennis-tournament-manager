@@ -1018,12 +1018,39 @@ function buildPlayerChecklist() {
   for (var i = 0; i < sorted.length; i++) {
     var p = sorted[i];
     var name = (p.last||'') + (p.first ? ', ' + p.first : '') + (p.rating ? ' (' + p.rating + ')' : '');
-    html += '<div class="player-check" onclick="togglePlayerCheck(' + p.id + ')">';
-    html += '<input type="checkbox" id="chk' + p.id + '">';
-    html += '<span>' + name + '</span>';
+    html += '<div class="player-check">';
+    html += '<input type="checkbox" id="chk' + p.id + '" onchange="updateSelCount()">';
+    html += '<span onclick="togglePlayerCheck(' + p.id + ')">' + name + '</span>';
     html += '</div>';
   }
   list.innerHTML = html;
+}
+
+function togglePlayerCheck(pid) {
+  var cb = document.getElementById('chk' + pid);
+  if (cb) { 
+    cb.checked = !cb.checked; 
+    updateSelCount(); 
+  }
+}
+
+function updateSelCount() {
+  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  var n = 0;
+  for (var i = 0; i < boxes.length; i++) { if (boxes[i].checked) n++; }
+  document.getElementById('ev-sel-count').textContent = n;
+}
+
+function selectAllPlayers() {
+  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  for (var i = 0; i < boxes.length; i++) { boxes[i].checked = true; }
+  updateSelCount();
+}
+
+function selectNonePlayers() {
+  var boxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  for (var i = 0; i < boxes.length; i++) { boxes[i].checked = false; }
+  updateSelCount();
 }
 
 function togglePlayerCheck(pid) {
