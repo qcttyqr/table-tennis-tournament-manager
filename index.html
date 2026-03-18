@@ -745,7 +745,7 @@
     <div id="ev-error" style="color:var(--accent3);font-size:13px;margin-top:8px;min-height:18px"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="createEvent()">Create Event</button>
+      <button class="btn btn-primary" onclick="()">Create Event</button>
     </div>
   </div>
 </div>
@@ -1078,18 +1078,26 @@ function selectNonePlayers() {
   updateSelCount();
 }
 
-function createEvent() {
+ffunction createEvent() {
   var errEl = document.getElementById('ev-error');
   errEl.textContent = '';
   var name = document.getElementById('ev-name').value.trim();
   if (!name) { errEl.textContent = 'Enter an event name.'; return; }
+  
+  // Get all checkboxes and collect checked player IDs
   var pIds = [];
-  var sorted = state.players.slice().sort(function(a,b){ return (a.last||'').localeCompare(b.last||''); });
-  for (var i = 0; i < sorted.length; i++) {
-    var cb = document.getElementById('chk' + sorted[i].id);
-    if (cb && cb.checked) { pIds.push(sorted[i].id); }
+  var checkboxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
+  
+  for (var i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked) {
+      // Extract the player ID from the checkbox id (removing 'chk' prefix)
+      var pid = parseInt(checkboxes[i].id.replace('chk', ''));
+      pIds.push(pid);
+    }
   }
+  
   if (!pIds.length) { errEl.textContent = 'Select at least one player.'; return; }
+  
   var ev = {
     id: nextEventId++,
     name: name,
@@ -1099,8 +1107,13 @@ function createEvent() {
     draw: null,
     scores: {}
   };
+  
   state.events.push(ev);
-  closeEventModal(); save(); renderEvents(); renderStatusBar(); populateEventSelects();
+  closeEventModal(); 
+  save(); 
+  renderEvents(); 
+  renderStatusBar(); 
+  populateEventSelects();
 }
 
 function renderEvents() {
