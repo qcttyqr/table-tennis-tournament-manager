@@ -745,7 +745,7 @@
     <div id="ev-error" style="color:var(--accent3);font-size:13px;margin-top:8px;min-height:18px"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="createEvent()">Create Event</button>
+      <button class="btn btn-primary" onclick="createNewEvent()">Create Event</button>
     </div>
   </div>
 </div>
@@ -1078,8 +1078,8 @@ function selectNonePlayers() {
   updateSelCount();
 }
 
-function createEvent() {
-  console.log("Create Event clicked");
+function createNewEvent() {
+  console.log("Create New Event clicked");
   var errEl = document.getElementById('ev-error');
   errEl.textContent = '';
   
@@ -1094,18 +1094,13 @@ function createEvent() {
   // Get all checkboxes and collect checked player IDs
   var pIds = [];
   var checkboxes = document.querySelectorAll('#ev-player-list input[type=checkbox]');
-  console.log("Found checkboxes:", checkboxes.length);
   
   for (var i = 0; i < checkboxes.length; i++) {
-    console.log("Checkbox", i, "checked:", checkboxes[i].checked, "id:", checkboxes[i].id);
     if (checkboxes[i].checked) {
       var pid = parseInt(checkboxes[i].id.replace('chk', ''));
-      console.log("Selected player ID:", pid);
       pIds.push(pid);
     }
   }
-  
-  console.log("Selected player IDs:", pIds);
   
   if (!pIds.length) { 
     errEl.textContent = 'Select at least one player.'; 
@@ -1114,7 +1109,6 @@ function createEvent() {
   
   var format = document.getElementById('ev-format').value;
   var best = parseInt(document.getElementById('ev-best').value);
-  console.log("Format:", format, "Best of:", best);
   
   var ev = {
     id: nextEventId++,
@@ -1126,29 +1120,12 @@ function createEvent() {
     scores: {}
   };
   
-  console.log("Created event object:", ev);
-  console.log("Current events before push:", state.events.length);
-  
   state.events.push(ev);
-  
-  console.log("Events after push:", state.events.length);
-  
-  function closeEventModal() { 
-  console.log("Closing modal");
-  document.getElementById('event-modal').classList.remove('open'); 
-  }
-  
-  save();
-  console.log("Saved to localStorage");
-  
-  renderEvents();
-  console.log("Rendered events");
-  
-  renderStatusBar();
+  closeEventModal(); 
+  save(); 
+  renderEvents(); 
+  renderStatusBar(); 
   populateEventSelects();
-  
-  // Verify the event was added
-  console.log("Final events array:", state.events);
 }
 
 function renderEvents() {
