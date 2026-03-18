@@ -600,7 +600,7 @@ function renderEvents(){
     html+='<div class="event-card-meta">'+fmt+' · Best of '+ev.best+' · '+pCount+' player'+(pCount!==1?'s':'')+'</div>';
     html+='<div class="event-card-actions">';
     html+='<button class="btn btn-secondary btn-sm" onclick="goToDraw('+ev.id+')">🎯 Draw</button>';
-    if(isRR) html+='<button class="btn btn-secondary btn-sm" onclick="goToScores('+ev.id+')">🏓 Scores</button>';
+    html+='<button class="btn btn-secondary btn-sm" onclick="goToScores('+ev.id+')">🏓 Scores</button>';
     if(isKO) html+='<button class="btn btn-secondary btn-sm" onclick="goToBracket('+ev.id+')">🏆 Bracket</button>';
     if(isRR&&ev.draw) html+='<button class="btn btn-ko btn-sm" onclick="openPromoteModal('+ev.id+')">🏆 → KO</button>';
     html+='<button class="btn btn-danger btn-sm" onclick="removeEvent('+i+')">✕</button>';
@@ -721,7 +721,13 @@ function renderScores(){
   var con=document.getElementById('scores-container');
   if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon">🏓</div><p>Select an event.</p></div>';return;}
   var ev=getEvent(evId);
-  if(!ev.draw||!ev.format.startsWith('rr')){con.innerHTML='<div class="empty"><div class="empty-icon">🏓</div><p>Generate a Round Robin draw first.</p></div>';return;}
+  if(!ev.draw){con.innerHTML='<div class="empty"><div class="empty-icon">🏓</div><p>Generate the draw first.</p></div>';return;}
+  if(ev.format.startsWith('rr')) renderScoresRR(ev,evId);
+  else renderScoresKO(ev,evId);
+}
+
+function renderScoresRR(ev,evId){
+  var con=document.getElementById('scores-container');
   var html='';
   ev.draw.forEach(function(grp,gi){
     html+='<div class="card"><div class="card-title">Group '+String.fromCharCode(65+gi)+'</div>';
@@ -730,17 +736,93 @@ function renderScores(){
         var pa=grp[a],pb=grp[b]; if(!pa||!pb)continue;
         var key=gi+'_'+a+'_'+b;
         var sc=ev.scores[key]||{};
-        html+='<div class="score-match">';
-        html+='<div class="score-player">'+pa.last+(pa.first?', '+pa.first:'')+'</div>';
-        html+='<div class="score-vs">vs</div>';
-        html+='<div class="score-player">'+pb.last+(pb.first?', '+pb.first:'')+'</div>';
-        html+='<button class="btn btn-secondary btn-sm" onclick="openScoreModal('+evId+','+gi+','+a+','+b+')">';
-        html+=(sc.a!==undefined?sc.a+' – '+sc.b:'+ Score')+'</button></div>';
+        html+=scoreMatchRow(pa,pb,sc,'openScoreModal('+evId+','+gi+','+a+','+b+')');
       }
     }
     html+='</div>';
   });
   con.innerHTML=html;
+}
+
+function renderScoresKO(ev,evId){
+  var con=document.getElementById('scores-container');
+  // KO draw is a flat array [p0,p1,p2,p3,...], pairs are [0v1],[2v3], etc.
+  // rounds: r0 has n/2 matches, r1 has n/4, etc.
+  var players=ev.draw;
+  var n=players.length;
+  var numRounds=Math.round(Math.log(n)/Math.log(2));
+  var html='';
+  for(var r=0;r<numRounds;r++){
+    var matchesInRound=n/Math.pow(2,r+1);
+    var label=r===numRounds-1?'Final':r===numRounds-2?'Semi-Finals':r===numRounds-3?'Quarter-Finals':'Round '+(r+1);
+    html+='<div class="card"><div class="card-title">'+label+'</div>';
+    for(var m=0;m<matchesInRound;m++){
+      var key='ko_r'+r+'_m'+m;
+      var sc=ev.scores[key]||{};
+      var pa=getKOPlayer(ev,r,m,0);
+      var pb=getKOPlayer(ev,r,m,1);
+      html+=scoreMatchRow(pa,pb,sc,'openKOScoreModal('+evId+','+r+','+m+')');
+    }
+    html+='</div>';
+  }
+  con.innerHTML=html;
+}
+
+function getKOPlayer(ev,round,match,slot){
+  // Round 0: read directly from draw array
+  if(round===0){
+    var idx=match*2+slot;
+    return ev.draw[idx]||null;
+  }
+  // Later rounds: winner of previous round match
+  var prevMatch=match*2+slot;
+  var prevKey='ko_r'+(round-1)+'_m'+prevMatch;
+  var prevSc=ev.scores[prevKey];
+  if(!prevSc) return null;
+  var prevPa=getKOPlayer(ev,round-1,prevMatch,0);
+  var prevPb=getKOPlayer(ev,round-1,prevMatch,1);
+  if(!prevPa||!prevPb) return null;
+  return prevSc.a>prevSc.b?prevPa:prevPb;
+}
+
+function scoreMatchRow(pa,pb,sc,onclickStr){
+  var aName=pa?pa.last+(pa.first?', '+pa.first:''):'TBD';
+  var bName=pb?pb.last+(pb.first?', '+pb.first:''):'TBD';
+  var scoreLabel=sc.a!==undefined?(sc.a+' – '+sc.b):'+ Score';
+  var canScore=pa&&pb;
+  var html='<div class="score-match">';
+  html+='<div class="score-player'+(sc.a!==undefined&&sc.a>sc.b?' winner':'')+'">'+aName+'</div>';
+  html+='<div class="score-vs">vs</div>';
+  html+='<div class="score-player'+(sc.a!==undefined&&sc.b>sc.a?' winner':'')+'">'+bName+'</div>';
+  if(canScore) html+='<button class="btn btn-secondary btn-sm" onclick="'+onclickStr+'">'+scoreLabel+'</button>';
+  else html+='<span style="color:var(--text-muted);font-size:12px">Waiting</span>';
+  html+='</div>';
+  return html;
+}
+
+function openKOScoreModal(evId,r,m){
+  var ev=getEvent(evId);
+  var pa=getKOPlayer(ev,r,m,0);
+  var pb=getKOPlayer(ev,r,m,1);
+  if(!pa||!pb){alert('Players not yet determined for this match.');return;}
+  _scoreTarget={evId:evId,koRound:r,koMatch:m,isKO:true};
+  var key='ko_r'+r+'_m'+m;
+  var sc=ev.scores[key]||{};
+  var html='<p style="margin-bottom:14px;font-size:13px;color:var(--text-dim)">'+pa.last+' vs '+pb.last+' · Best of '+ev.best+'</p>';
+  html+='<div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">';
+  for(var s=0;s<ev.best;s++){
+    var va=(sc.sets&&sc.sets[s])?sc.sets[s][0]:'';
+    var vb=(sc.sets&&sc.sets[s])?sc.sets[s][1]:'';
+    html+='<div style="text-align:center"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Set '+(s+1)+'</div>';
+    html+='<div style="display:flex;gap:4px;align-items:center">';
+    html+='<input type="number" id="s'+s+'a" value="'+va+'" min="0" max="30" style="width:44px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:600;padding:6px 0;outline:none">';
+    html+='<span style="color:var(--text-muted)">:</span>';
+    html+='<input type="number" id="s'+s+'b" value="'+vb+'" min="0" max="30" style="width:44px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:600;padding:6px 0;outline:none">';
+    html+='</div></div>';
+  }
+  html+='</div>';
+  document.getElementById('score-modal-content').innerHTML=html;
+  document.getElementById('score-modal').classList.add('open');
 }
 function openScoreModal(evId,gi,ai,bi){
   _scoreTarget={evId:evId,gi:gi,ai:ai,bi:bi};
@@ -767,9 +849,10 @@ function openScoreModal(evId,gi,ai,bi){
 }
 function closeScoreModal(){document.getElementById('score-modal').classList.remove('open');}
 function saveScore(){
-  var evId=_scoreTarget.evId,gi=_scoreTarget.gi,ai=_scoreTarget.ai,bi=_scoreTarget.bi;
-  var ev=getEvent(evId);
-  var key=gi+'_'+ai+'_'+bi;
+  var ev=getEvent(_scoreTarget.evId);
+  var key=_scoreTarget.isKO
+    ?('ko_r'+_scoreTarget.koRound+'_m'+_scoreTarget.koMatch)
+    :(_scoreTarget.gi+'_'+_scoreTarget.ai+'_'+_scoreTarget.bi);
   var sets=[]; var wa=0,wb=0;
   for(var s=0;s<ev.best;s++){
     var va=parseInt(document.getElementById('s'+s+'a').value)||0;
@@ -778,7 +861,7 @@ function saveScore(){
     if(va>vb)wa++; else if(vb>va)wb++;
   }
   ev.scores[key]={a:wa,b:wb,sets:sets};
-  closeScoreModal();save();renderScores();renderStandings();
+  closeScoreModal();save();renderScores();renderStandings();renderBracket();
 }
 
 // ── STANDINGS ──
@@ -903,30 +986,47 @@ function renderBracket(){
   if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Select an event.</p></div>';return;}
   var ev=getEvent(evId);
   if(!ev.draw||ev.format.startsWith('rr')){con.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Select a Knockout event.</p></div>';return;}
-  var players=ev.draw;
-  var n=players.length;
+  var n=ev.draw.length;
   var numRounds=Math.round(Math.log(n)/Math.log(2));
-  var rounds=[];
-  var pairs=[];
-  for(var i=0;i<n;i+=2)pairs.push([players[i],players[i+1]]);
-  rounds.push({label:'Round 1',pairs:pairs});
-  for(var r=1;r<numRounds;r++){
-    var prev=rounds[r-1].pairs;
-    var newPairs=[];
-    for(var j=0;j<prev.length;j+=2)newPairs.push([null,null]);
-    rounds.push({label:r===numRounds-1?'Final':'Round '+(r+1),pairs:newPairs});
-  }
   var html='<div class="bracket-rounds">';
-  rounds.forEach(function(rd){
-    html+='<div class="bracket-round"><div class="bracket-round-title">'+rd.label+'</div>';
-    rd.pairs.forEach(function(pair){
+  for(var r=0;r<numRounds;r++){
+    var matchesInRound=n/Math.pow(2,r+1);
+    var label=r===numRounds-1?'🥇 Final':r===numRounds-2?'Semi-Finals':r===numRounds-3?'Quarter-Finals':'Round '+(r+1);
+    html+='<div class="bracket-round"><div class="bracket-round-title">'+label+'</div>';
+    for(var m=0;m<matchesInRound;m++){
+      var pa=getKOPlayer(ev,r,m,0);
+      var pb=getKOPlayer(ev,r,m,1);
+      var key='ko_r'+r+'_m'+m;
+      var sc=ev.scores[key];
+      var aWon=sc&&sc.a>sc.b;
+      var bWon=sc&&sc.b>sc.a;
+      var aName=pa?pa.last+(pa.first?', '+pa.first:''):'TBD';
+      var bName=pb?pb.last+(pb.first?', '+pb.first:''):'TBD';
       html+='<div class="bracket-match">';
-      html+='<div class="bracket-player">'+(pair[0]?pair[0].last+(pair[0].first?', '+pair[0].first:''):'TBD')+'</div>';
-      html+='<div class="bracket-player">'+(pair[1]?pair[1].last+(pair[1].first?', '+pair[1].first:''):'TBD')+'</div>';
+      html+='<div class="bracket-player'+(aWon?' winner':'')+'">';
+      html+=aName+(sc?' <span style="margin-left:auto;font-weight:700;color:'+(aWon?'var(--accent)':'var(--text-muted)')+'">'+sc.a+'</span>':'');
       html+='</div>';
-    });
+      html+='<div class="bracket-player'+(bWon?' winner':'')+'">';
+      html+=bName+(sc?' <span style="margin-left:auto;font-weight:700;color:'+(bWon?'var(--accent)':'var(--text-muted)')+'">'+sc.b+'</span>':'');
+      html+='</div>';
+      html+='</div>';
+    }
+    // Champion display
+    if(r===numRounds-1){
+      var finalKey='ko_r'+(numRounds-1)+'_m0';
+      var finalSc=ev.scores[finalKey];
+      if(finalSc){
+        var champ=finalSc.a>finalSc.b?getKOPlayer(ev,numRounds-1,0,0):getKOPlayer(ev,numRounds-1,0,1);
+        if(champ){
+          html+='<div style="margin:10px;padding:12px;background:rgba(232,255,42,.08);border:1px solid var(--accent);border-radius:var(--radius);text-align:center">';
+          html+='<div style="font-size:20px">🏆</div>';
+          html+='<div style="font-family:var(--font-head);font-size:16px;font-weight:700;color:var(--accent)">'+champ.last+(champ.first?', '+champ.first:'')+'</div>';
+          html+='<div style="font-size:11px;color:var(--text-dim);margin-top:2px">Champion</div></div>';
+        }
+      }
+    }
     html+='</div>';
-  });
+  }
   html+='</div>';
   con.innerHTML=html;
 }
