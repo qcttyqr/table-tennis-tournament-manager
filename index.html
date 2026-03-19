@@ -181,54 +181,55 @@
       position:fixed;inset:0;z-index:9999;
       background:var(--bg);
       display:flex;align-items:center;justify-content:center;
+      min-height:100vh;
     }
-    #login-screen.hidden{display:none}
     .login-box{
       background:var(--bg2);
       border:1px solid var(--border2);
       border-top:3px solid var(--accent);
       border-radius:var(--radius-lg);
-      padding:40px 36px;
-      width:100%;max-width:380px;
-      box-shadow:0 24px 60px rgba(0,0,0,.6);
+      padding:44px 40px;
+      width:100%;max-width:400px;
+      margin:20px;
+      box-shadow:0 24px 60px rgba(0,0,0,.7);
       text-align:center;
     }
     .login-logo{
-      width:56px;height:56px;
+      width:60px;height:60px;
       background:var(--accent);
       border-radius:50%;
       display:flex;align-items:center;justify-content:center;
-      font-size:26px;margin:0 auto 20px;
-      box-shadow:0 0 20px rgba(232,71,42,.4);
+      font-size:28px;margin:0 auto 20px;
+      box-shadow:0 0 24px rgba(232,71,42,.45);
     }
     .login-title{
       font-family:var(--font-head);font-weight:800;
-      font-size:20px;letter-spacing:1px;
+      font-size:21px;letter-spacing:1px;
       text-transform:uppercase;color:var(--text);
       margin-bottom:4px;
     }
     .login-sub{
       font-size:12px;color:var(--text-dim);
-      letter-spacing:.5px;margin-bottom:28px;
+      letter-spacing:.5px;margin-bottom:30px;
     }
-    .login-box input{
+    .login-field{
       width:100%;background:var(--bg3);
       border:1px solid var(--border2);
       border-radius:var(--radius);
       color:var(--text);font-family:var(--font-body);
-      font-size:15px;padding:11px 14px;
+      font-size:14px;padding:11px 14px;
       outline:none;transition:border .18s;
-      margin-bottom:14px;text-align:center;
-      letter-spacing:2px;
+      margin-bottom:12px;text-align:left;
     }
-    .login-box input:focus{border-color:var(--accent)}
-    .login-box input::placeholder{letter-spacing:0;color:var(--text-muted)}
+    .login-field:focus{border-color:var(--accent)}
+    .login-field::placeholder{color:var(--text-muted)}
     .login-btn{
       width:100%;background:var(--accent);color:#fff;
       font-family:var(--font-head);font-weight:700;
       font-size:13px;letter-spacing:2px;text-transform:uppercase;
       border:none;border-radius:var(--radius);
       padding:12px;cursor:pointer;transition:all .18s;
+      margin-top:4px;
     }
     .login-btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,71,42,.35)}
     .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
@@ -236,7 +237,7 @@
       margin-top:12px;font-size:12px;
       color:#ff6b6b;min-height:18px;
     }
-    .login-footer{margin-top:20px;font-size:11px;color:var(--text-muted)}
+    .login-footer{margin-top:22px;font-size:11px;color:var(--text-muted)}
 
   </style>
 </head>
@@ -248,8 +249,9 @@
   <div class="login-box">
     <div class="login-logo">🏓</div>
     <div class="login-title">QCTT Tournament</div>
-    <div class="login-sub">Manager — Staff Access</div>
-    <input type="password" id="login-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-sub">Manager — Staff Access Only</div>
+    <input class="login-field" type="email" id="login-email" placeholder="Email address" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
+    <input class="login-field" type="password" id="login-password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
     <div id="login-error"></div>
     <div class="login-footer">Queen City Table Tennis Club · Regina, SK</div>
@@ -269,6 +271,7 @@
     <button class="btn-icon" onclick="saveBackup()">💾 Backup</button>
     <button class="btn-icon" onclick="loadBackup()">📂 Load</button>
     <button class="btn-icon" onclick="clearAll()">🗑 Clear</button>
+    <button class="btn-icon" onclick="doLogout()" style="border-color:rgba(232,71,42,.4);color:var(--accent)">⏻ Logout</button>
   </div>
 </header>
 
@@ -1269,6 +1272,9 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 
+// Force sign out on every page load so password is always required on refresh
+auth.signOut();
+
 // Auth state: show login or app
 auth.onAuthStateChanged(function(user) {
   if (user) {
@@ -1283,12 +1289,13 @@ auth.onAuthStateChanged(function(user) {
 function doLogin() {
   var btn = document.getElementById('login-btn');
   var errEl = document.getElementById('login-error');
+  var email = document.getElementById('login-email').value.trim();
   var password = document.getElementById('login-password').value;
-  if (!password) { errEl.textContent = 'Please enter the password.'; return; }
+  if (!email) { errEl.textContent = 'Please enter your email.'; return; }
+  if (!password) { errEl.textContent = 'Please enter your password.'; return; }
   btn.disabled = true;
   btn.textContent = 'Signing in…';
   errEl.textContent = '';
-  var email = 'admin@qctt.ca';
   auth.signInWithEmailAndPassword(email, password)
     .then(function() {
       document.getElementById('login-screen').style.display = 'none';
@@ -1297,12 +1304,28 @@ function doLogin() {
     .catch(function(error) {
       errEl.textContent = error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential'
         ? 'Incorrect password. Please try again.'
+        : error.code === 'auth/user-not-found'
+        ? 'No account found with that email.'
+        : error.code === 'auth/invalid-email'
+        ? 'Please enter a valid email address.'
         : error.code === 'auth/too-many-requests'
         ? 'Too many attempts. Please wait and try again.'
         : 'Sign in failed: ' + error.message;
       btn.disabled = false;
       btn.textContent = 'Sign In';
     });
+}
+
+function doLogout() {
+  auth.signOut().then(function() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-content').style.display = 'none';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('login-btn').disabled = false;
+    document.getElementById('login-btn').textContent = 'Sign In';
+  });
 }
 
 </script>
