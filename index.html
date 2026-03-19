@@ -9,6 +9,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
     :root {
       --bg:#0a0e1a;
@@ -356,6 +357,7 @@
         <button class="btn btn-primary" onclick="addPlayer()">+ Add Player</button>
         <label class="btn btn-secondary" style="cursor:pointer">📥 Import CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(this)"></label>
         <button class="btn btn-secondary" onclick="exportCSV()">📤 Export CSV</button>
+        <button class="btn btn-secondary" id="import-db-btn" onclick="importFromDatabase()" style="border-color:rgba(26,140,255,.5);color:#60a5fa">🔄 Import from Database</button>
       </div>
     </div>
     <div class="card">
@@ -1257,6 +1259,86 @@ function switchTab(name){
 document.querySelectorAll('nav button').forEach(function(btn){
   btn.onclick=function(){switchTab(btn.dataset.tab);};
 });
+
+// ── IMPORT FROM FIREBASE DATABASE ──
+function importFromDatabase() {
+  var btn = document.getElementById('import-db-btn');
+  var origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Loading…';
+
+  var db = firebase.database();
+  db.ref('users').once('value')
+    .then(function(snapshot) {
+      var data = snapshot.val();
+      if (!data) {
+        alert('No users found in the database.');
+        btn.disabled = false;
+        btn.textContent = origText;
+        return;
+      }
+
+      var imported = 0;
+      var skipped = 0;
+
+      Object.values(data).forEach(function(user) {
+        // Only import active users
+        if (!user.status || user.status.toLowerCase() !== 'active') {
+          skipped++;
+          return;
+        }
+
+        // Parse name — try splitting "First Last" or use full name as last name
+        var firstName = '', lastName = '';
+        if (user.name) {
+          var parts = user.name.trim().split(/\s+/);
+          if (parts.length >= 2) {
+            firstName = parts[0];
+            lastName = parts.slice(1).join(' ');
+          } else {
+            lastName = parts[0];
+          }
+        }
+
+        // Skip if already exists (match by full name)
+        var fullName = (firstName + ' ' + lastName).trim().toLowerCase();
+        var exists = state.players.some(function(p) {
+          return (p.first + ' ' + p.last).trim().toLowerCase() === fullName;
+        });
+
+        if (exists) {
+          skipped++;
+          return;
+        }
+
+        state.players.push({
+          id: nextPlayerId++,
+          first: firstName,
+          last: lastName,
+          nick: user.nick || user.nickname || '',
+          team: user.team || user.club || '',
+          gender: user.gender || '',
+          rating: parseInt(user.rating) || 0
+        });
+        imported++;
+      });
+
+      save();
+      renderPlayers();
+      renderStatusBar();
+
+      btn.disabled = false;
+      btn.textContent = origText;
+
+      alert('Import complete!\n✅ ' + imported + ' active player' + (imported !== 1 ? 's' : '') + ' imported\n⏭ ' + skipped + ' skipped (inactive or already exists)');
+    })
+    .catch(function(err) {
+      btn.disabled = false;
+      btn.textContent = origText;
+      alert('Database error: ' + err.message);
+    });
+}
+
 
 // ── INIT ──
 function renderAll(){
