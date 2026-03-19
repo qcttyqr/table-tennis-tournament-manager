@@ -178,10 +178,15 @@
   
     /* ── LOGIN SCREEN ── */
     #login-screen{
-      position:fixed;inset:0;z-index:9999;
+      position:fixed;
+      top:0;left:0;right:0;bottom:0;
+      width:100%;height:100%;
+      z-index:9999;
       background:var(--bg);
-      display:flex;align-items:center;justify-content:center;
-      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
     }
     .login-box{
       background:var(--bg2);
@@ -1271,9 +1276,6 @@ var firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
-
-// Force sign out on every page load so password is always required on refresh
-auth.signOut();
 
 // Auth state: show login or app
 auth.onAuthStateChanged(function(user) {
