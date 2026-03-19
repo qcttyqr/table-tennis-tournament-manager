@@ -6,6 +6,9 @@
   <title>TT Tournament Manager</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <style>
     :root {
       --bg:#0a0e1a;
@@ -172,9 +175,86 @@
     ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 
     @media(max-width:600px){header{padding:0 16px}main{padding:16px 14px 40px}nav button{padding:12px 10px;font-size:11px}}main{padding:16px 14px 40px}nav button{padding:12px 10px;font-size:11px}}main{padding:16px 14px 40px}nav button{padding:12px 10px;font-size:11px}}
+  
+    /* ── LOGIN SCREEN ── */
+    #login-screen{
+      position:fixed;inset:0;z-index:9999;
+      background:var(--bg);
+      display:flex;align-items:center;justify-content:center;
+    }
+    #login-screen.hidden{display:none}
+    .login-box{
+      background:var(--bg2);
+      border:1px solid var(--border2);
+      border-top:3px solid var(--accent);
+      border-radius:var(--radius-lg);
+      padding:40px 36px;
+      width:100%;max-width:380px;
+      box-shadow:0 24px 60px rgba(0,0,0,.6);
+      text-align:center;
+    }
+    .login-logo{
+      width:56px;height:56px;
+      background:var(--accent);
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:26px;margin:0 auto 20px;
+      box-shadow:0 0 20px rgba(232,71,42,.4);
+    }
+    .login-title{
+      font-family:var(--font-head);font-weight:800;
+      font-size:20px;letter-spacing:1px;
+      text-transform:uppercase;color:var(--text);
+      margin-bottom:4px;
+    }
+    .login-sub{
+      font-size:12px;color:var(--text-dim);
+      letter-spacing:.5px;margin-bottom:28px;
+    }
+    .login-box input{
+      width:100%;background:var(--bg3);
+      border:1px solid var(--border2);
+      border-radius:var(--radius);
+      color:var(--text);font-family:var(--font-body);
+      font-size:15px;padding:11px 14px;
+      outline:none;transition:border .18s;
+      margin-bottom:14px;text-align:center;
+      letter-spacing:2px;
+    }
+    .login-box input:focus{border-color:var(--accent)}
+    .login-box input::placeholder{letter-spacing:0;color:var(--text-muted)}
+    .login-btn{
+      width:100%;background:var(--accent);color:#fff;
+      font-family:var(--font-head);font-weight:700;
+      font-size:13px;letter-spacing:2px;text-transform:uppercase;
+      border:none;border-radius:var(--radius);
+      padding:12px;cursor:pointer;transition:all .18s;
+    }
+    .login-btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,71,42,.35)}
+    .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    #login-error{
+      margin-top:12px;font-size:12px;
+      color:#ff6b6b;min-height:18px;
+    }
+    .login-footer{margin-top:20px;font-size:11px;color:var(--text-muted)}
+
   </style>
 </head>
 <body>
+
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏓</div>
+    <div class="login-title">QCTT Tournament</div>
+    <div class="login-sub">Manager — Staff Access</div>
+    <input type="password" id="login-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div id="login-error"></div>
+    <div class="login-footer">Queen City Table Tennis Club · Regina, SK</div>
+  </div>
+</div>
 
 <header>
   <div class="logo">
@@ -1175,6 +1255,52 @@ function renderAll(){
 }
 loadData();
 renderAll();
+// ── FIREBASE AUTH ──
+var firebaseConfig = {
+  apiKey: "AIzaSyCaMXtmVZAVWFDRo5xXWQOUMdJbXlcgstM",
+  authDomain: "qctt-tournaments.firebaseapp.com",
+  databaseURL: "https://qctt-tournaments-default-rtdb.firebaseio.com",
+  projectId: "qctt-tournaments",
+  storageBucket: "qctt-tournaments.firebasestorage.app",
+  messagingSenderId: "145070999163",
+  appId: "1:145070999163:web:6bd65be709acd6314384de"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+
+// Check if already signed in
+auth.onAuthStateChanged(function(user) {
+  if (user) {
+    document.getElementById('login-screen').classList.add('hidden');
+  } else {
+    document.getElementById('login-screen').classList.remove('hidden');
+  }
+});
+
+function doLogin() {
+  var btn = document.getElementById('login-btn');
+  var errEl = document.getElementById('login-error');
+  var password = document.getElementById('login-password').value;
+  if (!password) { errEl.textContent = 'Please enter the password.'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  errEl.textContent = '';
+  var email = 'admin@qctt.ca';
+  auth.signInWithEmailAndPassword(email, password)
+    .then(function() {
+      document.getElementById('login-screen').classList.add('hidden');
+    })
+    .catch(function(error) {
+      errEl.textContent = error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential'
+        ? 'Incorrect password. Please try again.'
+        : error.code === 'auth/too-many-requests'
+        ? 'Too many attempts. Please wait and try again.'
+        : 'Sign in failed: ' + error.message;
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    });
+}
+
 </script>
 </body>
 </html>
