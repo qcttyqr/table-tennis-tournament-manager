@@ -10,8 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <style>
-    :root {
+  <sty    :root {
       --bg:#0a0e1a;
       --bg2:#111827;
       --bg3:#1a2235;
@@ -30,222 +29,264 @@
       --gold:#f7c948;
       --radius:6px;
       --radius-lg:10px;
+      --sidebar-w:220px;
       --font-head:'Montserrat',sans-serif;
       --font-body:'Open Sans',sans-serif;
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;min-height:100vh}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex;flex-direction:column}
 
-    header{
-      background:var(--bg2);
-      border-bottom:3px solid var(--accent);
+    /* ── SIDEBAR LAYOUT ── */
+    .app-shell{display:flex;flex:1;min-height:0}
+
+    /* ── TOPBAR ── */
+    #topbar{
+      background:var(--bg2);border-bottom:1px solid var(--border);
       display:flex;align-items:center;justify-content:space-between;
-      padding:0 28px;height:62px;position:sticky;top:0;z-index:100;
-      box-shadow:0 2px 20px rgba(0,0,0,.5);
+      padding:0 24px;height:52px;flex-shrink:0;
+      position:relative;z-index:50;
     }
-    .logo{display:flex;align-items:center;gap:12px;text-decoration:none}
-    .logo-ball{width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 0 12px rgba(232,71,42,.4)}
-    .logo-text{display:flex;flex-direction:column;line-height:1}
-    .logo-top{font-family:var(--font-head);font-weight:800;font-size:15px;letter-spacing:2px;color:var(--text);text-transform:uppercase}
-    .logo-sub{font-family:var(--font-head);font-weight:600;font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-top:2px}
-    .header-actions{display:flex;gap:8px}
-    .btn-icon{background:transparent;border:1px solid var(--border2);color:var(--text-dim);border-radius:var(--radius);padding:7px 13px;font-size:12px;cursor:pointer;transition:all .18s;font-family:var(--font-body);letter-spacing:.3px}
-    .btn-icon:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,71,42,.08)}
+    .topbar-left{display:flex;align-items:center;gap:14px}
+    .topbar-logo{display:flex;align-items:center;gap:10px}
+    .topbar-logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .topbar-logo-icon svg{width:18px;height:18px;fill:#fff}
+    .topbar-title{font-family:var(--font-head);font-weight:800;font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text)}
+    .topbar-divider{width:1px;height:20px;background:var(--border2)}
+    .topbar-tournament{font-size:12px;color:var(--text-dim);font-family:var(--font-head);letter-spacing:.5px}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .topbar-stat{padding:0 12px;border-right:1px solid var(--border);font-size:11px;color:var(--text-muted);text-align:center}
+    .topbar-stat:last-of-type{border-right:none;margin-right:8px}
+    .topbar-stat strong{display:block;font-size:16px;font-family:var(--font-head);font-weight:800;color:var(--accent2);line-height:1.2}
+    .btn-icon{background:transparent;border:1px solid var(--border2);color:var(--text-dim);border-radius:var(--radius);padding:6px 11px;font-size:11px;cursor:pointer;transition:all .18s;font-family:var(--font-head);font-weight:600;letter-spacing:.5px;display:flex;align-items:center;gap:5px}
+    .btn-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0}
+    .btn-icon:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-icon.logout{border-color:rgba(232,71,42,.3);color:var(--accent)}
+    .btn-icon.logout:hover{background:rgba(232,71,42,.1)}
 
-    #status-bar{background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;height:34px;font-size:12px;color:var(--text-dim);overflow-x:auto;gap:0}
-    #status-bar .pill{padding:0 16px;border-right:1px solid var(--border);white-space:nowrap}
-    #status-bar .pill:last-child{border-right:none}
-    #status-bar .pill strong{color:var(--accent2)}
+    /* ── SIDEBAR ── */
+    #sidebar{
+      width:var(--sidebar-w);flex-shrink:0;
+      background:var(--bg2);border-right:1px solid var(--border);
+      display:flex;flex-direction:column;
+      padding:16px 0;overflow-y:auto;
+    }
+    .sidebar-section-label{
+      font-family:var(--font-head);font-size:9px;font-weight:700;
+      letter-spacing:2.5px;text-transform:uppercase;color:var(--text-muted);
+      padding:14px 20px 6px;
+    }
+    .nav-item{
+      display:flex;align-items:center;gap:10px;
+      padding:9px 20px;cursor:pointer;
+      font-family:var(--font-head);font-size:12px;font-weight:600;
+      letter-spacing:.5px;color:var(--text-dim);
+      border:none;background:none;width:100%;text-align:left;
+      border-left:3px solid transparent;
+      transition:all .15s;position:relative;
+    }
+    .nav-item svg{width:16px;height:16px;stroke:currentColor;fill:none;flex-shrink:0;opacity:.7}
+    .nav-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+    .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(232,71,42,.07)}
+    .nav-item.active svg{opacity:1}
+    .sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)}
+    .sidebar-version{font-size:10px;color:var(--text-muted);font-family:var(--font-head);letter-spacing:.5px}
 
-    nav{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;padding:0 20px;overflow-x:auto;gap:2px}
-    nav button{background:none;border:none;border-bottom:3px solid transparent;color:var(--text-dim);font-family:var(--font-head);font-size:12px;font-weight:700;letter-spacing:1.5px;padding:14px 14px 11px;cursor:pointer;white-space:nowrap;transition:all .18s;text-transform:uppercase}
-    nav button:hover{color:var(--text)}
-    nav button.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(232,71,42,.05)}
-
-    main{max-width:1140px;margin:0 auto;padding:28px 24px 60px}
+    /* ── MAIN CONTENT ── */
+    #content{flex:1;overflow-y:auto;padding:28px 32px;min-width:0}
     .tab-panel{display:none}
     .tab-panel.active{display:block}
 
-    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px}
-    .card-title{font-family:var(--font-head);font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent2);margin-bottom:18px;display:flex;align-items:center;gap:8px}
-    .card-title::before{content:'';display:block;width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0}
+    /* ── PAGE HEADER ── */
+    .page-header{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .page-title{font-family:var(--font-head);font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--text);line-height:1}
+    .page-subtitle{font-size:12px;color:var(--text-dim);margin-top:4px;font-family:var(--font-head);letter-spacing:.3px}
+    .page-actions{display:flex;gap:8px;flex-wrap:wrap}
 
-    .form-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
-    .form-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:160px}
-    .form-group label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim)}
-    .form-group input,.form-group select{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:14px;padding:9px 12px;transition:border .18s,background .18s;outline:none}
-    .form-group input:focus,.form-group select:focus{border-color:var(--accent);background:var(--bg4)}
-    .form-group select option{background:var(--bg3)}
+    /* ── CARDS ── */
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px 24px;margin-bottom:18px}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .card-title{font-family:var(--font-head);font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:7px}
+    .card-title svg{width:13px;height:13px;stroke:var(--accent);fill:none;flex-shrink:0}
 
-    .btn{font-family:var(--font-head);font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;border:none;border-radius:var(--radius);padding:10px 20px;cursor:pointer;transition:all .18s}
+    /* ── FORMS ── */
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+    .form-grid-2{grid-template-columns:1fr 1fr}
+    .form-grid-3{grid-template-columns:1fr 1fr 1fr}
+    .field{display:flex;flex-direction:column;gap:5px}
+    .field.span2{grid-column:span 2}
+    .field label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted)}
+    .field input,.field select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 11px;outline:none;transition:border .15s,background .15s;width:100%}
+    .field input:focus,.field select:focus{border-color:var(--accent);background:var(--bg4)}
+    .field select option{background:var(--bg3)}
+
+    /* ── BUTTONS ── */
+    .btn{font-family:var(--font-head);font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:var(--radius);padding:9px 18px;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px}
+    .btn svg{width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0}
     .btn-primary{background:var(--accent);color:#fff}
-    .btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,71,42,.35)}
+    .btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(232,71,42,.35)}
     .btn-secondary{background:transparent;color:var(--text-dim);border:1px solid var(--border2)}
     .btn-secondary:hover{border-color:var(--accent3);color:var(--accent3)}
-    .btn-danger{background:transparent;color:#ff6b6b;border:1px solid rgba(255,107,107,.3)}
+    .btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}
+    .btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+    .btn-danger{background:transparent;color:#ff6b6b;border:1px solid rgba(255,107,107,.25)}
     .btn-danger:hover{background:rgba(255,107,107,.1);border-color:#ff6b6b}
-    .btn-sm{padding:5px 12px;font-size:11px}
-    .btn-ko{background:transparent;color:var(--gold);border:1px solid rgba(247,201,72,.4)}
-    .btn-ko:hover{background:rgba(247,201,72,.1);border-color:var(--gold)}
+    .btn-sm{padding:5px 11px;font-size:10px}
+    .btn-ko{background:transparent;color:var(--gold);border:1px solid rgba(247,201,72,.35)}
+    .btn-ko:hover{background:rgba(247,201,72,.08);border-color:var(--gold)}
+    .btn-db{background:transparent;color:var(--accent3);border:1px solid rgba(26,140,255,.3)}
+    .btn-db:hover{background:rgba(26,140,255,.08);border-color:var(--accent3)}
 
-    .table-wrap{overflow-x:auto}
+    /* ── TABLE ── */
+    .table-wrap{overflow-x:auto;border-radius:var(--radius)}
     table{width:100%;border-collapse:collapse}
-    th{font-family:var(--font-head);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--border)}
-    td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:14px}
+    thead tr{background:var(--bg3)}
+    th{font-family:var(--font-head);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:left;padding:9px 14px;border-bottom:1px solid var(--border)}
+    td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
     tr:last-child td{border-bottom:none}
-    tr:hover td{background:rgba(255,255,255,.02)}
-    .badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase}
-    .badge-m{background:rgba(26,140,255,.15);color:#60a5fa;border:1px solid rgba(26,140,255,.2)}
-    .badge-f{background:rgba(232,71,42,.12);color:#f87171;border:1px solid rgba(232,71,42,.2)}
-    .badge-o{background:rgba(247,148,29,.12);color:#fbbf24;border:1px solid rgba(247,148,29,.2)}
+    tbody tr:hover td{background:rgba(255,255,255,.02)}
+    .badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase}
+    .badge-m{background:rgba(26,140,255,.12);color:#60a5fa;border:1px solid rgba(26,140,255,.2)}
+    .badge-f{background:rgba(232,71,42,.1);color:#f87171;border:1px solid rgba(232,71,42,.2)}
+    .badge-o{background:rgba(247,148,29,.1);color:#fbbf24;border:1px solid rgba(247,148,29,.2)}
+    .td-actions{display:flex;gap:5px;align-items:center}
 
-    .event-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
-    .event-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;position:relative;transition:all .2s;overflow:hidden}
-    .event-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .2s}
+    /* ── EVENT CARDS ── */
+    .event-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+    .event-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden;transition:all .2s;cursor:default}
     .event-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
-    .event-card:hover::before{opacity:1}
-    .event-card-name{font-family:var(--font-head);font-size:18px;font-weight:800;letter-spacing:.5px;margin-bottom:6px;color:var(--text)}
-    .event-card-meta{font-size:12px;color:var(--text-dim);margin-bottom:14px;letter-spacing:.3px}
-    .event-card-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .event-dot{position:absolute;top:16px;right:16px;width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success)}
+    .event-card-top{padding:16px 18px 14px;border-bottom:1px solid var(--border)}
+    .event-card-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);font-family:var(--font-head);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .event-card-label-dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 5px var(--success)}
+    .event-card-name{font-family:var(--font-head);font-size:17px;font-weight:800;color:var(--text);letter-spacing:.3px}
+    .event-card-bottom{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .event-card-meta{font-size:11px;color:var(--text-dim);font-family:var(--font-head);letter-spacing:.3px}
+    .event-card-actions{display:flex;gap:6px;flex-wrap:wrap}
 
-    .draw-group{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px;overflow:hidden}
-    .draw-group-title{font-family:var(--font-head);font-size:12px;font-weight:700;letter-spacing:2px;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-    .draw-group-title::before{content:'';display:block;width:20px;height:2px;background:var(--accent);border-radius:1px}
-    .draw-player{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(45,58,82,.6);font-size:14px}
+    /* ── DRAW ── */
+    .draw-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .draw-group{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+    .draw-group-header{background:var(--bg4);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+    .draw-group-title{font-family:var(--font-head);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+    .draw-group-count{font-size:10px;color:var(--text-muted);background:var(--border);padding:2px 7px;border-radius:10px;font-family:var(--font-head)}
+    .draw-player{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(45,58,82,.5);font-size:13px}
     .draw-player:last-child{border-bottom:none}
-    .seed-num{font-family:var(--font-head);font-size:12px;font-weight:700;color:var(--text-muted);width:20px;text-align:right}
+    .draw-player:hover{background:rgba(255,255,255,.02)}
+    .seed-num{font-family:var(--font-head);font-size:11px;font-weight:700;color:var(--text-muted);width:18px;flex-shrink:0}
+    .draw-player-name{flex:1;font-weight:600}
+    .draw-player-rating{font-size:11px;color:var(--text-muted);font-family:var(--font-head)}
 
-    .score-match{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;transition:border-color .18s}
+    /* ── SCORES ── */
+    .score-match{display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:10px;padding:11px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:7px;transition:border-color .15s}
     .score-match:hover{border-color:var(--border2)}
-    .score-player{flex:1;font-size:14px}
-    .score-player.winner{color:var(--accent2);font-weight:600}
-    .score-vs{color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:1px}
+    .score-player{font-size:13px;font-weight:500}
+    .score-player.winner{color:var(--accent2);font-weight:700}
+    .score-player.right{text-align:right}
+    .score-vs{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text-muted);font-family:var(--font-head);text-align:center;padding:0 4px}
+    .score-auto{font-size:10px;color:var(--success);font-weight:700;font-family:var(--font-head);letter-spacing:.5px}
 
-    .st-rank{font-family:var(--font-head);font-size:18px;font-weight:900;color:var(--text-muted);width:32px;display:inline-block}
+    /* ── STANDINGS ── */
+    .st-rank{font-family:var(--font-head);font-size:16px;font-weight:900;color:var(--text-muted);width:28px;display:inline-block;text-align:center}
     .st-rank.gold{color:var(--gold)}
     .st-rank.silver{color:#94a3b8}
     .st-rank.bronze{color:#cd7f32}
 
-    .steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+    /* ── STEPS ── */
+    .steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
     .step{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;position:relative;overflow:hidden}
-    .step::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s}
-    .step:hover::after{transform:scaleX(1)}
-    .step-num{font-family:var(--font-head);font-size:32px;font-weight:900;color:rgba(232,71,42,.25);line-height:1;margin-bottom:8px}
-    .step p{font-size:12px;color:var(--text-dim);line-height:1.6}
-    .step strong{color:var(--text);font-family:var(--font-head);font-size:13px;letter-spacing:.3px}
+    .step-accent{position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--accent)}
+    .step-num{font-family:var(--font-head);font-size:28px;font-weight:900;color:rgba(232,71,42,.2);line-height:1;margin-bottom:8px}
+    .step p{font-size:11px;color:var(--text-dim);line-height:1.6;padding-left:10px}
+    .step strong{color:var(--text);display:block;font-family:var(--font-head);font-size:12px;margin-bottom:2px}
 
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+    /* ── MODAL ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
     .modal-overlay.open{display:flex}
-    .modal{background:var(--bg2);border:1px solid var(--border2);border-top:3px solid var(--accent);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:520px;margin:20px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
-    .modal-title{font-family:var(--font-head);font-size:18px;font-weight:800;letter-spacing:1px;margin-bottom:20px;color:var(--text);text-transform:uppercase}
-    .modal-actions{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+    .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:520px;margin:20px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+    .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .modal-title{font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:1px;color:var(--text);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+    .modal-title svg{width:16px;height:16px;stroke:var(--accent);fill:none;flex-shrink:0}
+    .modal-close{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;border-radius:4px;transition:color .15s;display:flex}
+    .modal-close:hover{color:var(--text)}
+    .modal-close svg{width:16px;height:16px;stroke:currentColor;fill:none}
+    .modal-body{padding:20px 24px}
+    .modal-actions{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
 
-    .event-select{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:14px;padding:8px 12px;margin-bottom:20px;outline:none;transition:border .18s}
+    /* ── SELECT ── */
+    .event-select{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:13px;padding:7px 11px;margin-bottom:18px;outline:none;transition:border .15s}
     .event-select:focus{border-color:var(--accent)}
 
-    .empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
-    .empty-icon{font-size:44px;margin-bottom:14px;opacity:.5}
-    .empty p{font-size:14px;letter-spacing:.3px}
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:56px 20px;color:var(--text-muted)}
+    .empty-icon{margin-bottom:14px;opacity:.25}
+    .empty-icon svg{width:48px;height:48px;stroke:var(--text-muted);fill:none;margin:0 auto}
+    .empty p{font-size:13px;color:var(--text-dim);font-family:var(--font-head);letter-spacing:.3px}
 
-    .preview-box{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 18px;font-size:13px;color:var(--text-dim);line-height:1.8}
-    .preview-box strong{color:var(--text);font-family:var(--font-head);font-size:16px;display:block;margin-bottom:2px}
+    /* ── PREVIEW ── */
+    .preview-box{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 18px;font-size:12px;color:var(--text-dim);line-height:1.8}
+    .preview-box strong{color:var(--text);font-family:var(--font-head);font-size:15px;display:block;margin-bottom:2px}
 
-    .player-list-select{max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg3)}
-    .player-check{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid rgba(45,58,82,.5);font-size:13px;cursor:pointer;user-select:none;transition:background .15s}
+    /* ── PLAYER CHECKLIST ── */
+    .player-list-select{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg3)}
+    .player-check{display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid rgba(45,58,82,.4);font-size:12px;cursor:pointer;user-select:none;transition:background .12s}
     .player-check:last-child{border-bottom:none}
-    .player-check:hover{background:rgba(232,71,42,.06)}
-    .player-check input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+    .player-check:hover{background:rgba(232,71,42,.05)}
+    .player-check input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;flex-shrink:0}
 
-    .bracket-rounds{display:flex;gap:0;overflow-x:auto;padding-bottom:10px}
-    .bracket-round{display:flex;flex-direction:column;justify-content:space-around;min-width:190px;padding:10px 0}
-    .bracket-round-title{font-family:var(--font-head);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);text-align:center;margin-bottom:10px;padding:6px 10px;background:var(--bg3);border-bottom:1px solid var(--border)}
-    .bracket-match{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin:5px 10px;font-size:13px;min-height:54px;display:flex;flex-direction:column;justify-content:center;gap:5px;transition:border-color .18s}
-    .bracket-match:hover{border-color:var(--border2)}
-    .bracket-player{padding:2px 0;border-bottom:1px solid rgba(45,58,82,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;justify-content:space-between}
+    /* ── BRACKET ── */
+    .bracket-rounds{display:flex;overflow-x:auto;padding-bottom:10px;gap:0}
+    .bracket-round{display:flex;flex-direction:column;justify-content:space-around;min-width:180px}
+    .bracket-round-header{background:var(--bg4);padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+    .bracket-round-title{font-family:var(--font-head);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted)}
+    .bracket-match{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;margin:6px 10px;font-size:12px;min-height:52px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+    .bracket-player{padding:2px 0;border-bottom:1px solid rgba(45,58,82,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;justify-content:space-between;align-items:center}
     .bracket-player:last-child{border-bottom:none}
-    .bracket-player.winner{color:var(--accent2);font-weight:600}
+    .bracket-player.winner{color:var(--accent2);font-weight:700}
 
-    .promote-preview{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text-dim);margin-bottom:10px;max-height:200px;overflow-y:auto}
-    .promote-pair{padding:5px 0;border-bottom:1px solid rgba(45,58,82,.5);display:flex;align-items:center;gap:8px}
+    /* ── PROMOTE ── */
+    .promote-preview{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text-dim);margin-bottom:10px;max-height:200px;overflow-y:auto}
+    .promote-pair{padding:5px 0;border-bottom:1px solid rgba(45,58,82,.4);display:flex;align-items:center;gap:8px}
     .promote-pair:last-child{border-bottom:none}
 
-    ::-webkit-scrollbar{width:6px;height:6px}
+    /* ── LOGIN ── */
+    #login-screen{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:380px;margin:20px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.7)}
+    .login-top{background:var(--accent);padding:28px 32px;text-align:center}
+    .login-top-icon{width:52px;height:52px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+    .login-top-icon svg{width:28px;height:28px;fill:#fff}
+    .login-top-title{font-family:var(--font-head);font-weight:900;font-size:18px;letter-spacing:1px;text-transform:uppercase;color:#fff}
+    .login-top-sub{font-size:11px;color:rgba(255,255,255,.75);letter-spacing:.5px;margin-top:3px;font-family:var(--font-head)}
+    .login-body{padding:28px 32px}
+    .login-field-wrap{margin-bottom:14px}
+    .login-field-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+    .login-field-label svg{width:11px;height:11px;stroke:currentColor;fill:none}
+    .login-field{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:13px;padding:10px 13px;outline:none;transition:border .15s}
+    .login-field:focus{border-color:var(--accent)}
+    .login-field::placeholder{color:var(--text-muted)}
+    .login-btn{width:100%;background:var(--accent);color:#fff;font-family:var(--font-head);font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;border:none;border-radius:var(--radius);padding:12px;cursor:pointer;transition:all .18s;margin-top:6px}
+    .login-btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(232,71,42,.35)}
+    .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    #login-error{margin-top:10px;font-size:11px;color:#ff6b6b;min-height:16px;font-family:var(--font-head);letter-spacing:.3px}
+    .login-footer{padding:14px 32px;border-top:1px solid var(--border);text-align:center;font-size:10px;color:var(--text-muted);font-family:var(--font-head);letter-spacing:.5px}
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar{width:5px;height:5px}
     ::-webkit-scrollbar-track{background:var(--bg2)}
     ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
     ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 
-    @media(max-width:600px){header{padding:0 16px}main{padding:16px 14px 40px}nav button{padding:12px 10px;font-size:11px}}main{padding:16px 14px 40px}nav button{padding:12px 10px;font-size:11px}}main{padding:16px 14px 40px}nav button{padding:12px 10px;font-size:11px}}
-  
-    /* ── LOGIN SCREEN ── */
-    #login-screen{
-      position:fixed;
-      top:0;left:0;right:0;bottom:0;
-      width:100%;height:100%;
-      z-index:9999;
-      background:var(--bg);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      :root{--sidebar-w:0px}
+      #sidebar{display:none}
+      #content{padding:16px}
+      .form-grid{grid-template-columns:1fr 1fr}
     }
-    .login-box{
-      background:var(--bg2);
-      border:1px solid var(--border2);
-      border-top:3px solid var(--accent);
-      border-radius:var(--radius-lg);
-      padding:44px 40px;
-      width:100%;max-width:400px;
-      margin:20px;
-      box-shadow:0 24px 60px rgba(0,0,0,.7);
-      text-align:center;
+    @media(max-width:480px){
+      .form-grid{grid-template-columns:1fr}
+      .field.span2{grid-column:span 1}
     }
-    .login-logo{
-      width:60px;height:60px;
-      background:var(--accent);
-      border-radius:50%;
-      display:flex;align-items:center;justify-content:center;
-      font-size:28px;margin:0 auto 20px;
-      box-shadow:0 0 24px rgba(232,71,42,.45);
-    }
-    .login-title{
-      font-family:var(--font-head);font-weight:800;
-      font-size:21px;letter-spacing:1px;
-      text-transform:uppercase;color:var(--text);
-      margin-bottom:4px;
-    }
-    .login-sub{
-      font-size:12px;color:var(--text-dim);
-      letter-spacing:.5px;margin-bottom:30px;
-    }
-    .login-field{
-      width:100%;background:var(--bg3);
-      border:1px solid var(--border2);
-      border-radius:var(--radius);
-      color:var(--text);font-family:var(--font-body);
-      font-size:14px;padding:11px 14px;
-      outline:none;transition:border .18s;
-      margin-bottom:12px;text-align:left;
-    }
-    .login-field:focus{border-color:var(--accent)}
-    .login-field::placeholder{color:var(--text-muted)}
-    .login-btn{
-      width:100%;background:var(--accent);color:#fff;
-      font-family:var(--font-head);font-weight:700;
-      font-size:13px;letter-spacing:2px;text-transform:uppercase;
-      border:none;border-radius:var(--radius);
-      padding:12px;cursor:pointer;transition:all .18s;
-      margin-top:4px;
-    }
-    .login-btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,71,42,.35)}
-    .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    #login-error{
-      margin-top:12px;font-size:12px;
-      color:#ff6b6b;min-height:18px;
-    }
-    .login-footer{margin-top:22px;font-size:11px;color:var(--text-muted)}
-
   </style>
+
 </head>
 <body>
 
@@ -253,207 +294,298 @@
 <!-- ── LOGIN SCREEN ── -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">🏓</div>
-    <div class="login-title">QCTT Tournament</div>
-    <div class="login-sub">Manager — Staff Access Only</div>
-    <input class="login-field" type="email" id="login-email" placeholder="Email address" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
-    <input class="login-field" type="password" id="login-password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
-    <div id="login-error"></div>
-    <div class="login-footer">Queen City Table Tennis Club · Regina, SK</div>
+    <div class="login-top">
+      <div class="login-top-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M12 3 Q16 12 12 21" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M3 12 Q12 8 21 12" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+      </div>
+      <div class="login-top-title">QCTT Tournament</div>
+      <div class="login-top-sub">Manager — Staff Access Only</div>
+    </div>
+    <div class="login-body">
+      <div class="login-field-wrap">
+        <div class="login-field-label"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-width="1.5"/><polyline points="22,6 12,13 2,6" stroke-width="1.5"/></svg>Email</div>
+        <input class="login-field" type="email" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
+      </div>
+      <div class="login-field-wrap">
+        <div class="login-field-label"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0110 0v4" stroke-width="1.5"/></svg>Password</div>
+        <input class="login-field" type="password" id="login-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+      <div id="login-error"></div>
+    </div>
+    <div class="login-footer">Queen City Table Tennis Club &nbsp;·&nbsp; Regina, SK</div>
   </div>
 </div>
 
 <div id="app-content" style="display:none">
-<header>
-  <div class="logo">
-    <div class="logo-ball">🏓</div>
-    <div class="logo-text">
-      <span class="logo-top">QCTT Tournament</span>
-      <span class="logo-sub">Manager</span>
-    </div>
-  </div>
-  <div class="header-actions">
-    <button class="btn-icon" onclick="saveBackup()">💾 Backup</button>
-    <button class="btn-icon" onclick="loadBackup()">📂 Load</button>
-    <button class="btn-icon" onclick="clearAll()">🗑 Clear</button>
-    <button class="btn-icon" onclick="doLogout()" style="border-color:rgba(232,71,42,.4);color:var(--accent)">⏻ Logout</button>
-  </div>
-</header>
 
-<div id="status-bar">
-  <div class="pill" id="sb-name">No tournament loaded</div>
-  <div class="pill" id="sb-date">—</div>
-  <div class="pill" id="sb-city">—</div>
-  <div class="pill"><strong id="pc">0</strong> players</div>
-  <div class="pill"><strong id="ec">0</strong> events</div>
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <div class="topbar-logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M12 3 Q16 12 12 21" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M3 12 Q12 8 21 12" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+      </div>
+      <span class="topbar-title">QCTT Tournament Manager</span>
+    </div>
+    <div class="topbar-divider"></div>
+    <span class="topbar-tournament" id="topbar-name">No tournament loaded</span>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-stat"><strong id="tc-players">0</strong>Players</div>
+    <div class="topbar-stat"><strong id="tc-events">0</strong>Events</div>
+    <button class="btn-icon" onclick="saveBackup()">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke-width="1.5"/><polyline points="17 21 17 13 7 13 7 21" stroke-width="1.5"/><polyline points="7 3 7 8 15 8" stroke-width="1.5"/></svg>
+      Save
+    </button>
+    <button class="btn-icon" onclick="loadBackup()">
+      <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" stroke-width="1.5"/></svg>
+      Load
+    </button>
+    <button class="btn-icon" onclick="clearAll()">
+      <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" stroke-width="1.5"/><path d="M19 6l-1 14H6L5 6" stroke-width="1.5"/><path d="M10 11v6M14 11v6" stroke-width="1.5"/></svg>
+      Clear
+    </button>
+    <button class="btn-icon logout" onclick="doLogout()">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke-width="1.5"/><polyline points="16 17 21 12 16 7" stroke-width="1.5"/><line x1="21" y1="12" x2="9" y2="12" stroke-width="1.5"/></svg>
+      Logout
+    </button>
+  </div>
 </div>
 
-<nav>
-  <button class="active" data-tab="setup">⚙️ Setup</button>
-  <button data-tab="players">👥 Players</button>
-  <button data-tab="events">📋 Events</button>
-  <button data-tab="draw">🎯 Draw</button>
-  <button data-tab="scores">🏓 Scores</button>
-  <button data-tab="standings">📊 Standings</button>
-  <button data-tab="bracket">🏆 Bracket</button>
-  <button data-tab="print">🖨️ Print</button>
-</nav>
+<div class="app-shell">
 
-<main>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sidebar-section-label">Tournament</div>
+  <button class="nav-item active" data-tab="setup">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="1.5"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke-width="1.5"/></svg>
+    Setup
+  </button>
+
+  <div class="sidebar-section-label">Players & Events</div>
+  <button class="nav-item" data-tab="players">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-width="1.5"/><circle cx="9" cy="7" r="4" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-width="1.5"/></svg>
+    Players
+  </button>
+  <button class="nav-item" data-tab="events">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/></svg>
+    Events
+  </button>
+
+  <div class="sidebar-section-label">Competition</div>
+  <button class="nav-item" data-tab="draw">
+    <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6" stroke-width="1.5"/><line x1="8" y1="12" x2="21" y2="12" stroke-width="1.5"/><line x1="8" y1="18" x2="21" y2="18" stroke-width="1.5"/><line x1="3" y1="6" x2="3.01" y2="6" stroke-width="2"/><line x1="3" y1="12" x2="3.01" y2="12" stroke-width="2"/><line x1="3" y1="18" x2="3.01" y2="18" stroke-width="2"/></svg>
+    Draw
+  </button>
+  <button class="nav-item" data-tab="scores">
+    <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke-width="1.5"/></svg>
+    Scores
+  </button>
+  <button class="nav-item" data-tab="standings">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10" stroke-width="1.5"/><line x1="12" y1="20" x2="12" y2="4" stroke-width="1.5"/><line x1="6" y1="20" x2="6" y2="14" stroke-width="1.5"/></svg>
+    Standings
+  </button>
+  <button class="nav-item" data-tab="bracket">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-width="1.5"/></svg>
+    Bracket
+  </button>
+
+  <div class="sidebar-section-label">Output</div>
+  <button class="nav-item" data-tab="print">
+    <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9" stroke-width="1.5"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" stroke-width="1.5"/><rect x="6" y="14" width="12" height="8" stroke-width="1.5"/></svg>
+    Print
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-version">QCTT Manager v2.0</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="content">
 
   <!-- SETUP -->
   <div class="tab-panel active" id="tab-setup">
-    <div class="card">
-      <div class="card-title">📌 Tournament Identity</div>
-      <div class="form-row">
-        <div class="form-group" style="flex:2;min-width:220px"><label>Full Tournament Name</label><input type="text" id="t-name" placeholder="Saskatchewan Open 2025" oninput="updateSetup()"></div>
-        <div class="form-group"><label>Year</label><input type="number" id="t-year" placeholder="2025" oninput="updateSetup()"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Short Name</label><input type="text" id="t-short" placeholder="SK Open" oninput="updateSetup()"></div>
-        <div class="form-group"><label>Date</label><input type="date" id="t-date" oninput="updateSetup()"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>City</label><input type="text" id="t-city" placeholder="Regina" oninput="updateSetup()"></div>
-        <div class="form-group"><label>Province / State</label><input type="text" id="t-province" placeholder="SK" oninput="updateSetup()"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group" style="flex:2"><label>Venue / Address</label><input type="text" id="t-venue" placeholder="Community Centre, 123 Main St" oninput="updateSetup()"></div>
-      </div>
-      <div class="card-title" style="margin-bottom:10px;margin-top:6px">Preview</div>
-      <div class="preview-box" id="setup-preview">—</div>
+    <div class="page-header">
+      <div><div class="page-title">Tournament Setup</div><div class="page-subtitle">Configure your tournament details</div></div>
     </div>
     <div class="card">
-      <div class="card-title">⚡ Quick Start Guide</div>
+      <div class="card-header">
+        <div class="card-title"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke-width="1.5"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-width="1.5"/></svg>Tournament Identity</div>
+      </div>
+      <div class="form-grid">
+        <div class="field span2"><label>Full Tournament Name</label><input type="text" id="t-name" placeholder="Saskatchewan Open 2025" oninput="updateSetup()"></div>
+        <div class="field"><label>Year</label><input type="number" id="t-year" placeholder="2025" oninput="updateSetup()"></div>
+        <div class="field"><label>Short Name</label><input type="text" id="t-short" placeholder="SK Open" oninput="updateSetup()"></div>
+        <div class="field"><label>Date</label><input type="date" id="t-date" oninput="updateSetup()"></div>
+        <div class="field"><label>City</label><input type="text" id="t-city" placeholder="Regina" oninput="updateSetup()"></div>
+        <div class="field"><label>Province / State</label><input type="text" id="t-province" placeholder="SK" oninput="updateSetup()"></div>
+        <div class="field span2"><label>Venue / Address</label><input type="text" id="t-venue" placeholder="Community Centre, 123 Main St" oninput="updateSetup()"></div>
+      </div>
+      <div style="margin-top:4px"><div class="card-title" style="margin-bottom:10px"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke-width="1.5"/></svg>Preview</div><div class="preview-box" id="setup-preview">—</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke-width="1.5"/></svg>Quick Start</div></div>
       <div class="steps">
-        <div class="step"><div class="step-num">1</div><p><strong>Fill in tournament info above</strong><br>Name, date, venue</p></div>
-        <div class="step"><div class="step-num">2</div><p><strong>Players → add players</strong><br>Rating enables snake seeding</p></div>
-        <div class="step"><div class="step-num">3</div><p><strong>Events → create RR event</strong><br>Assign players, pick format</p></div>
-        <div class="step"><div class="step-num">4</div><p><strong>Draw → generate draw</strong><br>Snake seeded by rating</p></div>
-        <div class="step"><div class="step-num">5</div><p><strong>Scores → enter results</strong><br>Standings update live</p></div>
-        <div class="step"><div class="step-num">6</div><p><strong>Events → 🏆 Advance to KO</strong><br>Top finishers seed into KO bracket</p></div>
+        <div class="step"><div class="step-accent"></div><div class="step-num">1</div><p><strong>Fill tournament info</strong>Name, date, venue</p></div>
+        <div class="step"><div class="step-accent"></div><div class="step-num">2</div><p><strong>Add players</strong>Rating enables seeding</p></div>
+        <div class="step"><div class="step-accent"></div><div class="step-num">3</div><p><strong>Create events</strong>Assign players &amp; format</p></div>
+        <div class="step"><div class="step-accent"></div><div class="step-num">4</div><p><strong>Generate draw</strong>Snake seeded by rating</p></div>
+        <div class="step"><div class="step-accent"></div><div class="step-num">5</div><p><strong>Enter scores</strong>Live standings update</p></div>
+        <div class="step"><div class="step-accent"></div><div class="step-num">6</div><p><strong>Advance to KO</strong>Top finishers seeded in</p></div>
       </div>
     </div>
   </div>
 
   <!-- PLAYERS -->
   <div class="tab-panel" id="tab-players">
-    <div class="card">
-      <div class="card-title">➕ Add Player</div>
-      <div class="form-row">
-        <div class="form-group"><label>First Name</label><input id="p-first" type="text" placeholder="Jane"></div>
-        <div class="form-group"><label>Last Name</label><input id="p-last" type="text" placeholder="Smith"></div>
-        <div class="form-group"><label>Nickname (opt)</label><input id="p-nick" type="text"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Team / Club</label><input id="p-team" type="text" placeholder="Regina TTC"></div>
-        <div class="form-group"><label>Gender</label>
-          <select id="p-gender"><option value="">—</option><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></select>
-        </div>
-        <div class="form-group"><label>Rating (opt)</label><input id="p-rating" type="number" placeholder="1500"></div>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="addPlayer()">+ Add Player</button>
-        <label class="btn btn-secondary" style="cursor:pointer">📥 Import CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(this)"></label>
-        <button class="btn btn-secondary" onclick="exportCSV()">📤 Export CSV</button>
-        <button class="btn btn-secondary" id="import-db-btn" onclick="importFromDatabase()" style="border-color:rgba(26,140,255,.5);color:#60a5fa">🔄 Import from Database</button>
+    <div class="page-header">
+      <div><div class="page-title">Players</div><div class="page-subtitle">Manage tournament participants</div></div>
+      <div class="page-actions">
+        <button class="btn btn-db" id="import-db-btn" onclick="importFromDatabase()">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" stroke-width="1.5"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke-width="1.5"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke-width="1.5"/></svg>
+          Import from DB
+        </button>
+        <label class="btn btn-ghost" style="cursor:pointer">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke-width="1.5"/><polyline points="17 8 12 3 7 8" stroke-width="1.5"/><line x1="12" y1="3" x2="12" y2="15" stroke-width="1.5"/></svg>
+          Import CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(this)">
+        </label>
+        <button class="btn btn-ghost" onclick="exportCSV()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke-width="1.5"/><polyline points="7 10 12 15 17 10" stroke-width="1.5"/><line x1="12" y1="15" x2="12" y2="3" stroke-width="1.5"/></svg>
+          Export CSV
+        </button>
       </div>
     </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-width="1.5"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="1.5"/></svg>Add Player</div></div>
+      <div class="form-grid">
+        <div class="field"><label>First Name</label><input id="p-first" type="text" placeholder="Jane"></div>
+        <div class="field"><label>Last Name</label><input id="p-last" type="text" placeholder="Smith"></div>
+        <div class="field"><label>Nickname</label><input id="p-nick" type="text" placeholder="Optional"></div>
+        <div class="field"><label>Team / Club</label><input id="p-team" type="text" placeholder="Regina TTC"></div>
+        <div class="field"><label>Gender</label>
+          <select id="p-gender"><option value="">— Select —</option><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></select>
+        </div>
+        <div class="field"><label>Rating</label><input id="p-rating" type="number" placeholder="1500"></div>
+      </div>
+      <button class="btn btn-primary" onclick="addPlayer()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-width="1.5"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="1.5"/></svg>
+        Add Player
+      </button>
+    </div>
     <div class="card">
-      <div class="card-title">👥 Registry — <span id="player-count">0</span> players</div>
+      <div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-width="1.5"/><circle cx="9" cy="7" r="4" stroke-width="1.5"/></svg>Registry — <span id="player-count">0</span> players</div></div>
       <div class="table-wrap">
         <table><thead><tr><th>#</th><th>Name</th><th>Nickname</th><th>Team</th><th>Gender</th><th>Rating</th><th>Actions</th></tr></thead>
         <tbody id="player-tbody"></tbody></table>
       </div>
-      <div class="empty" id="player-empty" style="display:none"><div class="empty-icon">👥</div><p>No players yet.</p></div>
+      <div class="empty" id="player-empty" style="display:none"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-width="1.5"/><circle cx="9" cy="7" r="4" stroke-width="1.5"/></svg></div><p>No players yet — add one above or import</p></div>
     </div>
   </div>
 
   <!-- EVENTS -->
   <div class="tab-panel" id="tab-events">
-    <div style="margin-bottom:16px"><button class="btn btn-primary" onclick="openEventModal()">➕ New Event</button></div>
+    <div class="page-header">
+      <div><div class="page-title">Events</div><div class="page-subtitle">Create and manage tournament events</div></div>
+      <div class="page-actions"><button class="btn btn-primary" onclick="openEventModal()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-width="1.5"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="1.5"/></svg>New Event</button></div>
+    </div>
     <div class="event-grid" id="event-grid"></div>
-    <div class="empty" id="event-empty"><div class="empty-icon">📋</div><p>No events yet. Click "New Event" to start.</p></div>
+    <div class="empty" id="event-empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/></svg></div><p>No events yet — click New Event to start</p></div>
   </div>
 
   <!-- DRAW -->
   <div class="tab-panel" id="tab-draw">
-    <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <select class="event-select" id="draw-event-select" onchange="renderDraw()" style="margin-bottom:0"></select>
-      <button class="btn btn-primary btn-sm" onclick="generateDraw()">🎯 Generate Draw</button>
-      <button class="btn btn-secondary btn-sm" onclick="shuffleDraw()">🔀 Shuffle</button>
+    <div class="page-header">
+      <div><div class="page-title">Draw</div><div class="page-subtitle">Generate and manage event draws</div></div>
+      <div class="page-actions">
+        <select class="event-select" id="draw-event-select" onchange="renderDraw()" style="margin-bottom:0"></select>
+        <button class="btn btn-primary" onclick="generateDraw()"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" stroke-width="1.5"/></svg>Generate</button>
+        <button class="btn btn-ghost" onclick="shuffleDraw()"><svg viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8" stroke-width="1.5"/><line x1="4" y1="20" x2="21" y2="3" stroke-width="1.5"/><polyline points="21 16 21 21 16 21" stroke-width="1.5"/><line x1="15" y1="15" x2="21" y2="21" stroke-width="1.5"/><line x1="4" y1="4" x2="9" y2="9" stroke-width="1.5"/></svg>Shuffle</button>
+      </div>
     </div>
-    <div id="draw-container"><div class="empty"><div class="empty-icon">🎯</div><p>Select an event to generate its draw.</p></div></div>
+    <div id="draw-container"><div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6" stroke-width="1.5"/><line x1="8" y1="12" x2="21" y2="12" stroke-width="1.5"/><line x1="8" y1="18" x2="21" y2="18" stroke-width="1.5"/><line x1="3" y1="6" x2="3.01" y2="6" stroke-width="2"/></svg></div><p>Select an event and generate the draw</p></div></div>
   </div>
 
   <!-- SCORES -->
   <div class="tab-panel" id="tab-scores">
-    <div style="margin-bottom:16px"><select class="event-select" id="scores-event-select" onchange="renderScores()" style="margin-bottom:0"></select></div>
-    <div id="scores-container"><div class="empty"><div class="empty-icon">🏓</div><p>Select an event.</p></div></div>
+    <div class="page-header">
+      <div><div class="page-title">Scores</div><div class="page-subtitle">Enter match results</div></div>
+      <div class="page-actions"><select class="event-select" id="scores-event-select" onchange="renderScores()" style="margin-bottom:0"></select></div>
+    </div>
+    <div id="scores-container"><div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke-width="1.5"/></svg></div><p>Select an event to enter scores</p></div></div>
   </div>
 
   <!-- STANDINGS -->
   <div class="tab-panel" id="tab-standings">
-    <div style="margin-bottom:16px"><select class="event-select" id="standings-event-select" onchange="renderStandings()" style="margin-bottom:0"></select></div>
-    <div id="standings-container"><div class="empty"><div class="empty-icon">📊</div><p>Select an event.</p></div></div>
+    <div class="page-header">
+      <div><div class="page-title">Standings</div><div class="page-subtitle">Live group standings</div></div>
+      <div class="page-actions"><select class="event-select" id="standings-event-select" onchange="renderStandings()" style="margin-bottom:0"></select></div>
+    </div>
+    <div id="standings-container"><div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10" stroke-width="1.5"/><line x1="12" y1="20" x2="12" y2="4" stroke-width="1.5"/><line x1="6" y1="20" x2="6" y2="14" stroke-width="1.5"/></svg></div><p>Select a Round Robin event to view standings</p></div></div>
   </div>
 
   <!-- BRACKET -->
   <div class="tab-panel" id="tab-bracket">
-    <div style="margin-bottom:16px"><select class="event-select" id="bracket-event-select" onchange="renderBracket()" style="margin-bottom:0"></select></div>
-    <div id="bracket-container"><div class="empty"><div class="empty-icon">🏆</div><p>Select a Knockout event.</p></div></div>
+    <div class="page-header">
+      <div><div class="page-title">Bracket</div><div class="page-subtitle">Knockout bracket view</div></div>
+      <div class="page-actions"><select class="event-select" id="bracket-event-select" onchange="renderBracket()" style="margin-bottom:0"></select></div>
+    </div>
+    <div id="bracket-container"><div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-width="1.5"/></svg></div><p>Select a Knockout event to view the bracket</p></div></div>
   </div>
 
   <!-- PRINT -->
   <div class="tab-panel" id="tab-print">
-    <div class="card">
-      <div class="card-title" style="font-size:16px;margin-bottom:6px">📋 Match Slips</div>
-      <p style="color:var(--text-dim);font-size:13px;margin-bottom:14px">Prints 2-up on letter paper.</p>
-      <div class="form-group" style="margin-bottom:14px"><label>Event</label><select id="print-event-slips" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px;padding:9px 12px;outline:none"></select></div>
-      <button class="btn btn-primary" onclick="printMatchSlips()">🖨️ Print Match Slips</button>
-    </div>
-    <div class="card">
-      <div class="card-title" style="font-size:16px;margin-bottom:6px">📊 Results Sheet</div>
-      <p style="color:var(--text-dim);font-size:13px;margin-bottom:14px">For rating coordinator submission.</p>
-      <div class="form-group" style="margin-bottom:14px"><label>Event</label><select id="print-event-results" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px;padding:9px 12px;outline:none"></select></div>
-      <button class="btn btn-primary" onclick="printResults()">🖨️ Print Results</button>
+    <div class="page-header"><div><div class="page-title">Print</div><div class="page-subtitle">Generate match slips and results sheets</div></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9" stroke-width="1.5"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" stroke-width="1.5"/><rect x="6" y="14" width="12" height="8" stroke-width="1.5"/></svg>Match Slips</div></div>
+        <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">Prints 2-up on letter paper with player names, group, and score table.</p>
+        <div class="field" style="margin-bottom:14px"><label>Event</label><select id="print-event-slips"></select></div>
+        <button class="btn btn-primary" onclick="printMatchSlips()"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9" stroke-width="1.5"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" stroke-width="1.5"/><rect x="6" y="14" width="12" height="8" stroke-width="1.5"/></svg>Print Slips</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="1.5"/><polyline points="14 2 14 8 20 8" stroke-width="1.5"/><line x1="16" y1="13" x2="8" y2="13" stroke-width="1.5"/><line x1="16" y1="17" x2="8" y2="17" stroke-width="1.5"/></svg>Results Sheet</div></div>
+        <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">Player names, ratings, teams. For TTCAN rating coordinator submission.</p>
+        <div class="field" style="margin-bottom:14px"><label>Event</label><select id="print-event-results"></select></div>
+        <button class="btn btn-primary" onclick="printResults()"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9" stroke-width="1.5"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" stroke-width="1.5"/><rect x="6" y="14" width="12" height="8" stroke-width="1.5"/></svg>Print Results</button>
+      </div>
     </div>
   </div>
 
-</main>
+</div><!-- end #content -->
+</div><!-- end .app-shell -->
 
 <!-- NEW EVENT MODAL -->
 <div class="modal-overlay" id="event-modal">
   <div class="modal">
-    <div class="modal-title">📋 New Event</div>
-    <div class="form-group" style="margin-bottom:14px"><label>Event Name</label><input type="text" id="ev-name" placeholder="Men's Open, U-18, etc."></div>
-    <div class="form-row">
-      <div class="form-group"><label>Draw Format</label>
-        <select id="ev-format">
-          <option value="rr4">Round Robin — 4/group</option>
-          <option value="rr3">Round Robin — 3/group</option>
-          <option value="rr5">Round Robin — 5/group</option>
-          <option value="ko8">Knockout — 8 players</option>
-          <option value="ko16">Knockout — 16 players</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Best of</label>
-        <select id="ev-best"><option value="5">Best of 5</option><option value="7">Best of 7</option></select>
-      </div>
+    <div class="modal-header">
+      <div class="modal-title"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/></svg>New Event</div>
+      <button class="modal-close" onclick="closeEventModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-width="1.5"/><line x1="6" y1="6" x2="18" y2="18" stroke-width="1.5"/></svg></button>
     </div>
-    <div class="form-group" style="margin-bottom:8px">
-      <label>Assign Players — <span id="ev-sel-count">0</span> selected</label>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <button class="btn btn-secondary btn-sm" onclick="selectAllPlayers()">All</button>
-        <button class="btn btn-secondary btn-sm" onclick="selectNonePlayers()">None</button>
+    <div class="modal-body">
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="field span2"><label>Event Name</label><input type="text" id="ev-name" placeholder="Men's Open, U-18, Mixed Doubles..."></div>
+        <div class="field"><label>Draw Format</label>
+          <select id="ev-format"><option value="rr4">Round Robin — 4/group</option><option value="rr3">Round Robin — 3/group</option><option value="rr5">Round Robin — 5/group</option><option value="ko8">Knockout — 8 players</option><option value="ko16">Knockout — 16 players</option></select>
+        </div>
+        <div class="field"><label>Best of</label>
+          <select id="ev-best"><option value="5">Best of 5</option><option value="7">Best of 7</option></select>
+        </div>
       </div>
-      <div class="player-list-select" id="ev-player-list"></div>
+      <div class="field" style="margin-bottom:6px">
+        <label>Assign Players — <span id="ev-sel-count">0</span> selected</label>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button class="btn btn-ghost btn-sm" onclick="selectAllPlayers()">Select All</button>
+          <button class="btn btn-ghost btn-sm" onclick="selectNonePlayers()">Clear</button>
+        </div>
+        <div class="player-list-select" id="ev-player-list"></div>
+      </div>
+      <div id="ev-error" style="color:#ff6b6b;font-size:11px;min-height:16px;margin-top:8px;font-family:var(--font-head)"></div>
     </div>
-    <div id="ev-error" style="color:var(--accent3);font-size:13px;min-height:18px;margin-top:6px"></div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="addNewEvent()">Create Event</button>
+      <button class="btn btn-ghost" onclick="closeEventModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addNewEvent()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-width="1.5"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="1.5"/></svg>Create Event</button>
     </div>
   </div>
 </div>
@@ -461,24 +593,23 @@
 <!-- EDIT PLAYER MODAL -->
 <div class="modal-overlay" id="edit-player-modal">
   <div class="modal">
-    <div class="modal-title">✏️ Edit Player</div>
-    <input type="hidden" id="ep-idx">
-    <div class="form-row">
-      <div class="form-group"><label>First Name</label><input id="ep-first" type="text"></div>
-      <div class="form-group"><label>Last Name</label><input id="ep-last" type="text"></div>
+    <div class="modal-header">
+      <div class="modal-title"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke-width="1.5"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-width="1.5"/></svg>Edit Player</div>
+      <button class="modal-close" onclick="closeEditPlayer()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-width="1.5"/><line x1="6" y1="6" x2="18" y2="18" stroke-width="1.5"/></svg></button>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Nickname</label><input id="ep-nick" type="text"></div>
-      <div class="form-group"><label>Team</label><input id="ep-team" type="text"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Gender</label>
-        <select id="ep-gender"><option value="">—</option><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></select>
+    <div class="modal-body">
+      <input type="hidden" id="ep-idx">
+      <div class="form-grid">
+        <div class="field"><label>First Name</label><input id="ep-first" type="text"></div>
+        <div class="field"><label>Last Name</label><input id="ep-last" type="text"></div>
+        <div class="field"><label>Nickname</label><input id="ep-nick" type="text"></div>
+        <div class="field"><label>Team</label><input id="ep-team" type="text"></div>
+        <div class="field"><label>Gender</label><select id="ep-gender"><option value="">—</option><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></select></div>
+        <div class="field"><label>Rating</label><input id="ep-rating" type="number"></div>
       </div>
-      <div class="form-group"><label>Rating</label><input id="ep-rating" type="number"></div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeEditPlayer()">Cancel</button>
+      <button class="btn btn-ghost" onclick="closeEditPlayer()">Cancel</button>
       <button class="btn btn-primary" onclick="saveEditPlayer()">Save Changes</button>
     </div>
   </div>
@@ -487,10 +618,13 @@
 <!-- SCORE ENTRY MODAL -->
 <div class="modal-overlay" id="score-modal">
   <div class="modal">
-    <div class="modal-title">🏓 Score Entry</div>
-    <div id="score-modal-content"></div>
+    <div class="modal-header">
+      <div class="modal-title"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke-width="1.5"/></svg>Score Entry</div>
+      <button class="modal-close" onclick="closeScoreModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-width="1.5"/><line x1="6" y1="6" x2="18" y2="18" stroke-width="1.5"/></svg></button>
+    </div>
+    <div class="modal-body" id="score-modal-content"></div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeScoreModal()">Cancel</button>
+      <button class="btn btn-ghost" onclick="closeScoreModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveScore()">Save Score</button>
     </div>
   </div>
@@ -499,36 +633,32 @@
 <!-- PROMOTE TO KO MODAL -->
 <div class="modal-overlay" id="promote-modal">
   <div class="modal">
-    <div class="modal-title">🏆 Advance to Knockout</div>
-    <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px">
-      Creates a new KO event from RR standings. Top finishers are cross-seeded so group winners meet as late as possible.
-    </p>
-    <div class="form-group" style="margin-bottom:14px">
-      <label>KO Event Name</label>
-      <input type="text" id="promote-name" placeholder="e.g. Men's Open — KO">
+    <div class="modal-header">
+      <div class="modal-title"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke-width="1.5"/></svg>Advance to Knockout</div>
+      <button class="modal-close" onclick="closePromoteModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-width="1.5"/><line x1="6" y1="6" x2="18" y2="18" stroke-width="1.5"/></svg></button>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Advance per group</label>
-        <select id="promote-advance" onchange="updatePromotePreview()">
-          <option value="1">Top 1 (winner only)</option>
-          <option value="2" selected>Top 2</option>
-          <option value="3">Top 3</option>
-        </select>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px;line-height:1.6">Creates a new KO event from RR standings. Top finishers are cross-seeded so group winners meet as late as possible.</p>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="field span2"><label>KO Event Name</label><input type="text" id="promote-name" placeholder="Men's Open — KO"></div>
+        <div class="field"><label>Advance per group</label>
+          <select id="promote-advance" onchange="updatePromotePreview()"><option value="1">Top 1 only</option><option value="2" selected>Top 2</option><option value="3">Top 3</option></select>
+        </div>
+        <div class="field"><label>Best of (KO)</label>
+          <select id="promote-best"><option value="5">Best of 5</option><option value="7">Best of 7</option></select>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Best of (KO rounds)</label>
-        <select id="promote-best"><option value="5">Best of 5</option><option value="7">Best of 7</option></select>
-      </div>
+      <div class="promote-preview" id="promote-preview"></div>
+      <div id="promote-error" style="color:#ff6b6b;font-size:11px;min-height:16px;font-family:var(--font-head)"></div>
     </div>
-    <div class="promote-preview" id="promote-preview"></div>
-    <div id="promote-error" style="color:var(--accent3);font-size:13px;min-height:18px"></div>
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closePromoteModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="doPromoteToKO()">Create KO Event</button>
+      <button class="btn btn-ghost" onclick="closePromoteModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="doPromoteToKO()"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke-width="1.5"/></svg>Create KO Event</button>
     </div>
   </div>
 </div>
+
+</div><!-- end app-content -->
 
 <script>
 // ── STATE ──
@@ -558,7 +688,8 @@ function loadBackup() {
   inp.onchange=function(e){
     var fr=new FileReader();
     fr.onload=function(ev){
-      try{var d=JSON.parse(ev.target.result);state=d.state;nextPlayerId=d.nextPlayerId;nextEventId=d.nextEventId;save();renderAll();}catch(e){alert('Invalid backup file.');}
+      try{var d=JSON.parse(ev.target.result);state=d.state;nextPlayerId=d.nextPlayerId;nextEventId=d.nextEventId;save();renderAll();}
+      catch(e){alert('Invalid backup file.');}
     };
     fr.readAsText(e.target.files[0]);
   };
@@ -601,11 +732,12 @@ function loadSetupFields() {
 // ── STATUS BAR ──
 function renderStatusBar() {
   var t=state.tournament;
-  document.getElementById('sb-name').innerHTML=t.name?('<strong>'+t.name+(t.year?' '+t.year:'')+'</strong>'):'No tournament loaded';
-  document.getElementById('sb-date').textContent=t.date||'—';
-  document.getElementById('sb-city').textContent=t.city?(t.city+(t.province?' '+t.province:'')):'—';
-  document.getElementById('pc').textContent=state.players.length;
-  document.getElementById('ec').textContent=state.events.length;
+  var nameEl=document.getElementById('topbar-name');
+  if(nameEl) nameEl.textContent=t.name?(t.name+(t.year?' '+t.year:'')):'No tournament loaded';
+  var pcEl=document.getElementById('tc-players');
+  if(pcEl) pcEl.textContent=state.players.length;
+  var ecEl=document.getElementById('tc-events');
+  if(ecEl) ecEl.textContent=state.events.length;
 }
 
 // ── PLAYERS ──
@@ -636,8 +768,8 @@ function renderPlayers() {
     html+='<td style="color:var(--text-dim)">'+(p.nick||'—')+'</td>';
     html+='<td style="color:var(--text-dim)">'+(p.team||'—')+'</td>';
     html+='<td>'+(p.gender?'<span class="badge badge-'+p.gender.toLowerCase()+'">'+p.gender+'</span>':'—')+'</td>';
-    html+='<td style="font-weight:600">'+(p.rating||'—')+'</td>';
-    html+='<td style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" onclick="openEditPlayer('+i+')">✏️</button><button class="btn btn-danger btn-sm" onclick="removePlayer('+i+')">✕</button></td></tr>';
+    html+='<td style="font-weight:600;font-family:var(--font-head)">'+(p.rating||'—')+'</td>';
+    html+='<td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openEditPlayer('+i+')">Edit</button><button class="btn btn-danger btn-sm" onclick="removePlayer('+i+')">Remove</button></td></tr>';
   });
   tbody.innerHTML=html;
 }
@@ -688,6 +820,36 @@ function exportCSV(){
   var a=document.createElement('a'); a.href='data:text/csv,'+encodeURIComponent(csv); a.download='players.csv'; a.click();
 }
 
+// ── IMPORT FROM FIREBASE ──
+function importFromDatabase() {
+  var btn=document.getElementById('import-db-btn');
+  var origText=btn.textContent.trim();
+  btn.disabled=true; btn.textContent='Loading…';
+  var db=firebase.database();
+  db.ref('users').once('value').then(function(snapshot){
+    var data=snapshot.val();
+    if(!data){alert('No users found in the database.');btn.disabled=false;btn.textContent=origText;return;}
+    var imported=0,skipped=0;
+    Object.values(data).forEach(function(user){
+      if(!user.status||user.status.toLowerCase()!=='active'){skipped++;return;}
+      var firstName='',lastName='';
+      if(user.name){
+        var parts=user.name.trim().split(' ');
+        if(parts.length>=2){firstName=parts[0];lastName=parts.slice(1).join(' ');}
+        else{lastName=parts[0];}
+      }
+      var fullName=(firstName+' '+lastName).trim().toLowerCase();
+      var exists=state.players.some(function(p){return(p.first+' '+p.last).trim().toLowerCase()===fullName;});
+      if(exists){skipped++;return;}
+      state.players.push({id:nextPlayerId++,first:firstName,last:lastName,nick:user.nick||user.nickname||'',team:user.team||user.club||'',gender:user.gender||'',rating:parseInt(user.rating)||0});
+      imported++;
+    });
+    save();renderPlayers();renderStatusBar();
+    btn.disabled=false;btn.textContent=origText;
+    alert('Import complete!\n' + imported + ' active player(s) imported\n' + skipped + ' skipped');
+  }).catch(function(err){btn.disabled=false;btn.textContent=origText;alert('Database error: '+err.message);});
+}
+
 // ── EVENTS ──
 function openEventModal(){
   if(!state.players.length){alert('Add players first.');return;}
@@ -718,7 +880,7 @@ function togglePlayerCheck(pid){
 function closeEventModal(){document.getElementById('event-modal').classList.remove('open');}
 function updateSelCount(){
   var boxes=document.querySelectorAll('#ev-player-list input[type=checkbox]');
-  var n=0; for(var i=0;i<boxes.length;i++){if(boxes[i].checked)n++;} 
+  var n=0; for(var i=0;i<boxes.length;i++){if(boxes[i].checked)n++;}
   document.getElementById('ev-sel-count').textContent=n;
 }
 function selectAllPlayers(){
@@ -752,16 +914,20 @@ function renderEvents(){
     var fmt={rr3:'RR 3/grp',rr4:'RR 4/grp',rr5:'RR 5/grp',ko8:'KO 8',ko16:'KO 16'}[ev.format]||ev.format;
     var isRR=ev.format.startsWith('rr');
     var isKO=ev.format.startsWith('ko');
-    html+='<div class="event-card"><div class="event-dot"></div>';
+    html+='<div class="event-card">';
+    html+='<div class="event-card-top">';
+    html+='<div class="event-card-label"><span class="event-card-label-dot"></span>'+fmt+' &nbsp;·&nbsp; Best of '+ev.best+'</div>';
     html+='<div class="event-card-name">'+ev.name+'</div>';
-    html+='<div class="event-card-meta">'+fmt+' · Best of '+ev.best+' · '+pCount+' player'+(pCount!==1?'s':'')+'</div>';
+    html+='</div>';
+    html+='<div class="event-card-bottom">';
+    html+='<div class="event-card-meta">'+pCount+' player'+(pCount!==1?'s':'')+'</div>';
     html+='<div class="event-card-actions">';
-    html+='<button class="btn btn-secondary btn-sm" onclick="goToDraw('+ev.id+')">🎯 Draw</button>';
-    html+='<button class="btn btn-secondary btn-sm" onclick="goToScores('+ev.id+')">🏓 Scores</button>';
-    if(isKO) html+='<button class="btn btn-secondary btn-sm" onclick="goToBracket('+ev.id+')">🏆 Bracket</button>';
-    if(isRR&&ev.draw) html+='<button class="btn btn-ko btn-sm" onclick="openPromoteModal('+ev.id+')">🏆 → KO</button>';
-    html+='<button class="btn btn-danger btn-sm" onclick="removeEvent('+i+')">✕</button>';
-    html+='</div></div>';
+    html+='<button class="btn btn-ghost btn-sm" onclick="goToDraw('+ev.id+')">Draw</button>';
+    html+='<button class="btn btn-ghost btn-sm" onclick="goToScores('+ev.id+')">Scores</button>';
+    if(isKO) html+='<button class="btn btn-ghost btn-sm" onclick="goToBracket('+ev.id+')">Bracket</button>';
+    if(isRR&&ev.draw) html+='<button class="btn btn-ko btn-sm" onclick="openPromoteModal('+ev.id+')">Advance to KO</button>';
+    html+='<button class="btn btn-danger btn-sm" onclick="removeEvent('+i+')">Remove</button>';
+    html+='</div></div></div>';
   });
   grid.innerHTML=html;
 }
@@ -769,7 +935,7 @@ function removeEvent(idx){if(!confirm('Remove this event?'))return;state.events.
 function populateEventSelects(){
   var ids=['draw-event-select','scores-event-select','standings-event-select','bracket-event-select'];
   ids.forEach(function(id){
-    var sel=document.getElementById(id);
+    var sel=document.getElementById(id); if(!sel)return;
     var cur=sel.value;
     sel.innerHTML='<option value="">— Select Event —</option>';
     state.events.forEach(function(ev){sel.innerHTML+='<option value="'+ev.id+'">'+ev.name+'</option>';});
@@ -777,7 +943,7 @@ function populateEventSelects(){
   });
   var prints=['print-event-slips','print-event-results'];
   prints.forEach(function(id){
-    var sel=document.getElementById(id);
+    var sel=document.getElementById(id); if(!sel)return;
     var cur=sel.value;
     sel.innerHTML='<option value="all">— All Events —</option>';
     state.events.forEach(function(ev){sel.innerHTML+='<option value="'+ev.id+'">'+ev.name+'</option>';});
@@ -804,7 +970,6 @@ function generateDraw(){
     var numGroups=Math.ceil(sorted.length/size);
     var groups=[];
     for(var g=0;g<numGroups;g++)groups.push([]);
-    // Snake seed
     sorted.forEach(function(p,i){
       var round=Math.floor(i/numGroups);
       var groupIdx=i%numGroups;
@@ -813,17 +978,16 @@ function generateDraw(){
     });
     ev.draw=groups;
   } else {
-    var size=parseInt(ev.format.replace('ko',''));
+    var sz=parseInt(ev.format.replace('ko',''));
     var seeded=sorted.slice();
-    while(seeded.length<size)seeded.push(null);
+    while(seeded.length<sz)seeded.push(null);
     ev.draw=seeded;
   }
   ev.scores={};
   save();renderDraw();renderEvents();
 }
 function shuffleDraw(){
-  var evId=document.getElementById('draw-event-select').value;
-  if(!evId)return;
+  var evId=document.getElementById('draw-event-select').value; if(!evId)return;
   var ev=getEvent(evId);
   var players=ev.playerIds.map(function(id){return getPlayer(id);}).filter(Boolean);
   var shuffled=players.slice().sort(function(){return Math.random()-.5;});
@@ -843,31 +1007,33 @@ function shuffleDraw(){
 function renderDraw(){
   var evId=document.getElementById('draw-event-select').value;
   var con=document.getElementById('draw-container');
-  if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon">🎯</div><p>Select an event.</p></div>';return;}
+  if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" width="48" height="48"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><p>Select an event and generate the draw</p></div>';return;}
   var ev=getEvent(evId);
-  if(!ev.draw){con.innerHTML='<div class="empty"><div class="empty-icon">🎯</div><p>Click Generate Draw to create the draw.</p></div>';return;}
+  if(!ev.draw){con.innerHTML='<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" width="48" height="48"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><p>Click Generate to create the draw</p></div>';return;}
   var html='';
   if(ev.format.startsWith('rr')){
+    html+='<div class="draw-groups">';
     ev.draw.forEach(function(grp,gi){
-      html+='<div class="draw-group"><div class="draw-group-title">Group '+String.fromCharCode(65+gi)+'</div>';
+      html+='<div class="draw-group"><div class="draw-group-header"><span class="draw-group-title">Group '+String.fromCharCode(65+gi)+'</span><span class="draw-group-count">'+grp.length+' players</span></div>';
       grp.forEach(function(p,pi){
         if(!p)return;
-        html+='<div class="draw-player"><span class="seed-num">'+(pi+1)+'</span><span>'+p.last+(p.first?', '+p.first:'')+'</span>';
-        if(p.team)html+='<span style="color:var(--text-muted);font-size:12px">'+p.team+'</span>';
-        if(p.rating)html+='<span style="color:var(--text-dim);font-size:12px;margin-left:auto">'+p.rating+'</span>';
+        html+='<div class="draw-player"><span class="seed-num">'+(pi+1)+'</span><span class="draw-player-name">'+p.last+(p.first?', '+p.first:'')+'</span>';
+        if(p.team)html+='<span style="color:var(--text-muted);font-size:11px">'+p.team+'</span>';
+        if(p.rating)html+='<span class="draw-player-rating">'+p.rating+'</span>';
         html+='</div>';
       });
       html+='</div>';
     });
+    html+='</div>';
   } else {
-    html+='<div class="draw-group"><div class="draw-group-title">KO Draw</div>';
+    html+='<div class="draw-groups"><div class="draw-group"><div class="draw-group-header"><span class="draw-group-title">KO Seeding</span><span class="draw-group-count">'+ev.draw.filter(Boolean).length+' players</span></div>';
     ev.draw.forEach(function(p,i){
       html+='<div class="draw-player"><span class="seed-num">'+(i+1)+'</span>';
-      if(p)html+='<span>'+p.last+(p.first?', '+p.first:'')+'</span>'+(p.rating?'<span style="color:var(--text-dim);font-size:12px;margin-left:auto">'+p.rating+'</span>':'');
+      if(p)html+='<span class="draw-player-name">'+p.last+(p.first?', '+p.first:'')+'</span>'+(p.rating?'<span class="draw-player-rating">'+p.rating+'</span>':'');
       else html+='<span style="color:var(--text-muted)">BYE</span>';
       html+='</div>';
     });
-    html+='</div>';
+    html+='</div></div>';
   }
   con.innerHTML=html;
 }
@@ -876,18 +1042,17 @@ function renderDraw(){
 function renderScores(){
   var evId=document.getElementById('scores-event-select').value;
   var con=document.getElementById('scores-container');
-  if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon">🏓</div><p>Select an event.</p></div>';return;}
+  if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" width="48" height="48"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><p>Select an event to enter scores</p></div>';return;}
   var ev=getEvent(evId);
-  if(!ev.draw){con.innerHTML='<div class="empty"><div class="empty-icon">🏓</div><p>Generate the draw first.</p></div>';return;}
+  if(!ev.draw){con.innerHTML='<div class="empty"><p>Generate the draw first</p></div>';return;}
   if(ev.format.startsWith('rr')) renderScoresRR(ev,evId);
   else renderScoresKO(ev,evId);
 }
-
 function renderScoresRR(ev,evId){
   var con=document.getElementById('scores-container');
   var html='';
   ev.draw.forEach(function(grp,gi){
-    html+='<div class="card"><div class="card-title">Group '+String.fromCharCode(65+gi)+'</div>';
+    html+='<div class="card"><div class="card-header"><div class="card-title">Group '+String.fromCharCode(65+gi)+'</div></div>';
     for(var a=0;a<grp.length;a++){
       for(var b=a+1;b<grp.length;b++){
         var pa=grp[a],pb=grp[b]; if(!pa||!pb)continue;
@@ -900,7 +1065,6 @@ function renderScoresRR(ev,evId){
   });
   con.innerHTML=html;
 }
-
 function renderScoresKO(ev,evId){
   var con=document.getElementById('scores-container');
   var n=ev.draw.length;
@@ -909,23 +1073,17 @@ function renderScoresKO(ev,evId){
   for(var r=0;r<numRounds;r++){
     var matchesInRound=n/Math.pow(2,r+1);
     var label=r===numRounds-1?'Final':r===numRounds-2?'Semi-Finals':r===numRounds-3?'Quarter-Finals':'Round '+(r+1);
-    html+='<div class="card"><div class="card-title">'+label+'</div>';
+    html+='<div class="card"><div class="card-header"><div class="card-title">'+label+'</div></div>';
     for(var m=0;m<matchesInRound;m++){
-      var key='ko_r'+r+'_m'+m;
-      var sc=ev.scores[key]||{};
       var pa=getKOPlayer(ev,r,m,0);
       var pb=getKOPlayer(ev,r,m,1);
-      // BYE match — one player auto-advances, show that clearly
       var isBye=(pa&&!pb)||(!pa&&pb);
       if(isBye){
-        var advancer=pa||pb;
-        html+='<div class="score-match">';
-        html+='<div class="score-player">'+advancer.last+(advancer.first?', '+advancer.first:'')+'</div>';
-        html+='<div class="score-vs">vs</div>';
-        html+='<div class="score-player" style="color:var(--text-muted)">BYE</div>';
-        html+='<span style="color:var(--success);font-size:12px;font-weight:600">✓ Auto-advanced</span>';
-        html+='</div>';
+        var adv=pa||pb;
+        html+='<div class="score-match"><div class="score-player">'+adv.last+(adv.first?', '+adv.first:'')+'</div><div class="score-vs">vs</div><div class="score-player" style="color:var(--text-muted)">BYE</div><span class="score-auto">✓ Auto-advanced</span></div>';
       } else {
+        var key='ko_r'+r+'_m'+m;
+        var sc=ev.scores[key]||{};
         html+=scoreMatchRow(pa,pb,sc,'openKOScoreModal('+evId+','+r+','+m+')');
       }
     }
@@ -933,43 +1091,42 @@ function renderScoresKO(ev,evId){
   }
   con.innerHTML=html;
 }
-
 function getKOPlayer(ev,round,match,slot){
-  // Round 0: read directly from draw array
-  if(round===0){
-    var idx=match*2+slot;
-    return ev.draw[idx]||null;
-  }
-  // Later rounds: winner of previous round match
+  if(round===0){var idx=match*2+slot;return ev.draw[idx]||null;}
   var prevMatch=match*2+slot;
   var prevPa=getKOPlayer(ev,round-1,prevMatch,0);
   var prevPb=getKOPlayer(ev,round-1,prevMatch,1);
-  // If one side is a BYE, the real player auto-advances — no score needed
-  if(prevPa&&!prevPb) return prevPa;
-  if(prevPb&&!prevPa) return prevPb;
-  if(!prevPa&&!prevPb) return null;
-  // Both present — need a score
+  if(prevPa&&!prevPb)return prevPa;
+  if(prevPb&&!prevPa)return prevPb;
+  if(!prevPa&&!prevPb)return null;
   var prevKey='ko_r'+(round-1)+'_m'+prevMatch;
   var prevSc=ev.scores[prevKey];
-  if(!prevSc) return null;
+  if(!prevSc)return null;
   return prevSc.a>prevSc.b?prevPa:prevPb;
 }
-
 function scoreMatchRow(pa,pb,sc,onclickStr){
   var aName=pa?pa.last+(pa.first?', '+pa.first:''):'TBD';
   var bName=pb?pb.last+(pb.first?', '+pb.first:''):'TBD';
-  var scoreLabel=sc.a!==undefined?(sc.a+' – '+sc.b):'+ Score';
+  var scoreLabel=sc.a!==undefined?(sc.a+' – '+sc.b):'Enter Score';
   var canScore=pa&&pb;
   var html='<div class="score-match">';
   html+='<div class="score-player'+(sc.a!==undefined&&sc.a>sc.b?' winner':'')+'">'+aName+'</div>';
-  html+='<div class="score-vs">vs</div>';
-  html+='<div class="score-player'+(sc.a!==undefined&&sc.b>sc.a?' winner':'')+'">'+bName+'</div>';
-  if(canScore) html+='<button class="btn btn-secondary btn-sm" onclick="'+onclickStr+'">'+scoreLabel+'</button>';
-  else html+='<span style="color:var(--text-muted);font-size:12px">Waiting</span>';
+  html+='<div class="score-vs">VS</div>';
+  html+='<div class="score-player right'+(sc.a!==undefined&&sc.b>sc.a?' winner':'')+'">'+bName+'</div>';
+  if(canScore)html+='<button class="btn btn-ghost btn-sm" onclick="'+onclickStr+'">'+scoreLabel+'</button>';
+  else html+='<span style="color:var(--text-muted);font-size:11px;font-family:var(--font-head)">Waiting</span>';
   html+='</div>';
   return html;
 }
-
+function openScoreModal(evId,gi,ai,bi){
+  _scoreTarget={evId:evId,gi:gi,ai:ai,bi:bi,isKO:false};
+  var ev=getEvent(evId);
+  var grp=ev.draw[gi];
+  var pa=grp[ai],pb=grp[bi];
+  var key=gi+'_'+ai+'_'+bi;
+  buildScoreModal(pa,pb,ev.best,ev.scores[key]||{});
+  document.getElementById('score-modal').classList.add('open');
+}
 function openKOScoreModal(evId,r,m){
   var ev=getEvent(evId);
   var pa=getKOPlayer(ev,r,m,0);
@@ -977,52 +1134,29 @@ function openKOScoreModal(evId,r,m){
   if(!pa||!pb){alert('Players not yet determined for this match.');return;}
   _scoreTarget={evId:evId,koRound:r,koMatch:m,isKO:true};
   var key='ko_r'+r+'_m'+m;
-  var sc=ev.scores[key]||{};
-  var html='<p style="margin-bottom:14px;font-size:13px;color:var(--text-dim)">'+pa.last+' vs '+pb.last+' · Best of '+ev.best+'</p>';
-  html+='<div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">';
-  for(var s=0;s<ev.best;s++){
-    var va=(sc.sets&&sc.sets[s])?sc.sets[s][0]:'';
-    var vb=(sc.sets&&sc.sets[s])?sc.sets[s][1]:'';
-    html+='<div style="text-align:center"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Set '+(s+1)+'</div>';
-    html+='<div style="display:flex;gap:4px;align-items:center">';
-    html+='<input type="number" id="s'+s+'a" value="'+va+'" min="0" max="30" style="width:44px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:600;padding:6px 0;outline:none">';
-    html+='<span style="color:var(--text-muted)">:</span>';
-    html+='<input type="number" id="s'+s+'b" value="'+vb+'" min="0" max="30" style="width:44px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:600;padding:6px 0;outline:none">';
-    html+='</div></div>';
-  }
-  html+='</div>';
-  document.getElementById('score-modal-content').innerHTML=html;
+  buildScoreModal(pa,pb,ev.best,ev.scores[key]||{});
   document.getElementById('score-modal').classList.add('open');
 }
-function openScoreModal(evId,gi,ai,bi){
-  _scoreTarget={evId:evId,gi:gi,ai:ai,bi:bi};
-  var ev=getEvent(evId);
-  var grp=ev.draw[gi];
-  var pa=grp[ai],pb=grp[bi];
-  var key=gi+'_'+ai+'_'+bi;
-  var sc=ev.scores[key]||{};
-  var html='<p style="margin-bottom:14px;font-size:13px;color:var(--text-dim)">'+pa.last+' vs '+pb.last+' · Best of '+ev.best+'</p>';
-  html+='<div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">';
-  for(var s=0;s<ev.best;s++){
+function buildScoreModal(pa,pb,best,sc){
+  var html='<p style="margin-bottom:14px;font-size:12px;color:var(--text-dim);font-family:var(--font-head)">'+pa.last+' vs '+pb.last+' · Best of '+best+'</p>';
+  html+='<div style="display:flex;gap:10px;flex-wrap:wrap">';
+  for(var s=0;s<best;s++){
     var va=(sc.sets&&sc.sets[s])?sc.sets[s][0]:'';
     var vb=(sc.sets&&sc.sets[s])?sc.sets[s][1]:'';
-    html+='<div style="text-align:center"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Set '+(s+1)+'</div>';
+    html+='<div style="text-align:center"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;font-family:var(--font-head);letter-spacing:1px">SET '+(s+1)+'</div>';
     html+='<div style="display:flex;gap:4px;align-items:center">';
-    html+='<input type="number" id="s'+s+'a" value="'+va+'" min="0" max="30" style="width:44px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:600;padding:6px 0;outline:none">';
-    html+='<span style="color:var(--text-muted)">:</span>';
-    html+='<input type="number" id="s'+s+'b" value="'+vb+'" min="0" max="30" style="width:44px;text-align:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:600;padding:6px 0;outline:none">';
+    html+='<input type="number" id="s'+s+'a" value="'+va+'" min="0" max="30" style="width:46px;text-align:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:16px;font-weight:700;padding:6px 0;outline:none;font-family:var(--font-head)">';
+    html+='<span style="color:var(--text-muted);font-size:12px">:</span>';
+    html+='<input type="number" id="s'+s+'b" value="'+vb+'" min="0" max="30" style="width:46px;text-align:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:16px;font-weight:700;padding:6px 0;outline:none;font-family:var(--font-head)">';
     html+='</div></div>';
   }
   html+='</div>';
   document.getElementById('score-modal-content').innerHTML=html;
-  document.getElementById('score-modal').classList.add('open');
 }
 function closeScoreModal(){document.getElementById('score-modal').classList.remove('open');}
 function saveScore(){
   var ev=getEvent(_scoreTarget.evId);
-  var key=_scoreTarget.isKO
-    ?('ko_r'+_scoreTarget.koRound+'_m'+_scoreTarget.koMatch)
-    :(_scoreTarget.gi+'_'+_scoreTarget.ai+'_'+_scoreTarget.bi);
+  var key=_scoreTarget.isKO?('ko_r'+_scoreTarget.koRound+'_m'+_scoreTarget.koMatch):(_scoreTarget.gi+'_'+_scoreTarget.ai+'_'+_scoreTarget.bi);
   var sets=[]; var wa=0,wb=0;
   for(var s=0;s<ev.best;s++){
     var va=parseInt(document.getElementById('s'+s+'a').value)||0;
@@ -1056,20 +1190,19 @@ function getGroupStandings(ev){
 function renderStandings(){
   var evId=document.getElementById('standings-event-select').value;
   var con=document.getElementById('standings-container');
-  if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon">📊</div><p>Select an event.</p></div>';return;}
+  if(!evId){con.innerHTML='<div class="empty"><p>Select a Round Robin event</p></div>';return;}
   var ev=getEvent(evId);
-  if(!ev.draw||!ev.format.startsWith('rr')){con.innerHTML='<div class="empty"><div class="empty-icon">📊</div><p>Generate a Round Robin draw first.</p></div>';return;}
+  if(!ev.draw||!ev.format.startsWith('rr')){con.innerHTML='<div class="empty"><p>Generate a Round Robin draw first</p></div>';return;}
   var rankClasses=['gold','silver','bronze'];
   var html='';
-  var allStandings=getGroupStandings(ev);
-  allStandings.forEach(function(rows,gi){
-    html+='<div class="card"><div class="card-title">Group '+String.fromCharCode(65+gi)+' Standings</div><div class="table-wrap"><table>';
+  getGroupStandings(ev).forEach(function(rows,gi){
+    html+='<div class="card"><div class="card-header"><div class="card-title">Group '+String.fromCharCode(65+gi)+' Standings</div></div><div class="table-wrap"><table>';
     html+='<thead><tr><th>#</th><th>Player</th><th>W</th><th>L</th><th>Sets W-L</th></tr></thead><tbody>';
     rows.forEach(function(r,ri){
       html+='<tr><td><span class="st-rank '+(rankClasses[ri]||'')+'">'+(ri+1)+'</span></td>';
       html+='<td><strong>'+r.player.last+(r.player.first?', '+r.player.first:'')+'</strong>'+(r.player.team?'<br><small style="color:var(--text-muted)">'+r.player.team+'</small>':'')+'</td>';
-      html+='<td style="color:var(--success)">'+r.w+'</td><td style="color:var(--accent3)">'+r.l+'</td>';
-      html+='<td>'+r.sw+'–'+r.sl+'</td></tr>';
+      html+='<td style="color:var(--success);font-weight:700">'+r.w+'</td><td style="color:#ff6b6b;font-weight:700">'+r.l+'</td>';
+      html+='<td style="font-family:var(--font-head)">'+r.sw+'–'+r.sl+'</td></tr>';
     });
     html+='</tbody></table></div></div>';
   });
@@ -1088,45 +1221,34 @@ function openPromoteModal(evId){
   document.getElementById('promote-modal').classList.add('open');
 }
 function closePromoteModal(){document.getElementById('promote-modal').classList.remove('open');}
-
 function buildKOSeeding(standings,advance){
-  // Cross-seed: 1st of group A vs 2nd of group B, etc.
   var pools=[];
-  for(var r=0;r<advance;r++){
-    for(var g=0;g<standings.length;g++){
-      if(standings[g][r]) pools.push(standings[g][r].player);
-    }
-  }
-  // Pad to next power of 2
+  for(var r=0;r<advance;r++)
+    for(var g=0;g<standings.length;g++)
+      if(standings[g][r])pools.push(standings[g][r].player);
   var sz=1; while(sz<pools.length)sz*=2;
   while(pools.length<sz)pools.push(null);
   return pools;
 }
-
 function updatePromotePreview(){
-  var ev=getEvent(_promoteSourceId);
-  if(!ev||!ev.draw){return;}
+  var ev=getEvent(_promoteSourceId); if(!ev||!ev.draw)return;
   var advance=parseInt(document.getElementById('promote-advance').value);
   var standings=getGroupStandings(ev);
   var seeded=buildKOSeeding(standings,advance);
   var real=seeded.filter(function(p){return p;});
-  var html='<strong style="color:var(--text);display:block;margin-bottom:8px">'+real.length+' players advancing into KO bracket:</strong>';
+  var html='<strong style="color:var(--text);display:block;margin-bottom:8px;font-family:var(--font-head);font-size:12px">'+real.length+' players advancing:</strong>';
   for(var i=0;i<seeded.length;i+=2){
     var pa=seeded[i],pb=seeded[i+1];
-    html+='<div class="promote-pair">';
-    html+='<span style="color:var(--accent);font-weight:700;width:20px">'+(i/2+1)+'.</span>';
+    html+='<div class="promote-pair"><span style="color:var(--accent);font-weight:700;font-family:var(--font-head);width:20px">'+(i/2+1)+'.</span>';
     html+='<span>'+(pa?pa.last+(pa.first?', '+pa.first:''):'BYE')+'</span>';
-    html+='<span style="color:var(--text-muted);margin:0 6px">vs</span>';
-    html+='<span>'+(pb?pb.last+(pb.first?', '+pb.first:''):'BYE')+'</span>';
-    html+='</div>';
+    html+='<span style="color:var(--text-muted);margin:0 6px;font-size:11px">vs</span>';
+    html+='<span>'+(pb?pb.last+(pb.first?', '+pb.first:''):'BYE')+'</span></div>';
   }
   document.getElementById('promote-preview').innerHTML=html;
 }
-
 function doPromoteToKO(){
   var errEl=document.getElementById('promote-error'); errEl.textContent='';
-  var ev=getEvent(_promoteSourceId);
-  if(!ev||!ev.draw){errEl.textContent='Source event has no draw.';return;}
+  var ev=getEvent(_promoteSourceId); if(!ev||!ev.draw){errEl.textContent='Source event has no draw.';return;}
   var name=document.getElementById('promote-name').value.trim();
   if(!name){errEl.textContent='Enter a name for the KO event.';return;}
   var advance=parseInt(document.getElementById('promote-advance').value);
@@ -1136,12 +1258,8 @@ function doPromoteToKO(){
   if(real.length<2){errEl.textContent='Not enough players — enter match scores first.';return;}
   var sz=seeded.length;
   var fmt=sz<=8?'ko8':'ko16';
-  var koEv={
-    id:nextEventId++, name:name, format:fmt,
-    best:parseInt(document.getElementById('promote-best').value),
-    playerIds:real.map(function(p){return p.id;}),
-    draw:seeded, scores:{}
-  };
+  var koEv={id:nextEventId++,name:name,format:fmt,best:parseInt(document.getElementById('promote-best').value),
+    playerIds:real.map(function(p){return p.id;}),draw:seeded,scores:{}};
   state.events.push(koEv);
   closePromoteModal();save();renderEvents();renderStatusBar();populateEventSelects();
   switchTab('bracket');
@@ -1153,45 +1271,39 @@ function doPromoteToKO(){
 function renderBracket(){
   var evId=document.getElementById('bracket-event-select').value;
   var con=document.getElementById('bracket-container');
-  if(!evId){con.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Select an event.</p></div>';return;}
+  if(!evId){con.innerHTML='<div class="empty"><p>Select a Knockout event</p></div>';return;}
   var ev=getEvent(evId);
-  if(!ev.draw||ev.format.startsWith('rr')){con.innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Select a Knockout event.</p></div>';return;}
+  if(!ev.draw||ev.format.startsWith('rr')){con.innerHTML='<div class="empty"><p>Select a Knockout event</p></div>';return;}
   var n=ev.draw.length;
   var numRounds=Math.round(Math.log(n)/Math.log(2));
   var html='<div class="bracket-rounds">';
   for(var r=0;r<numRounds;r++){
     var matchesInRound=n/Math.pow(2,r+1);
-    var label=r===numRounds-1?'🥇 Final':r===numRounds-2?'Semi-Finals':r===numRounds-3?'Quarter-Finals':'Round '+(r+1);
-    html+='<div class="bracket-round"><div class="bracket-round-title">'+label+'</div>';
+    var label=r===numRounds-1?'Final':r===numRounds-2?'Semi-Finals':r===numRounds-3?'Quarter-Finals':'Round '+(r+1);
+    html+='<div class="bracket-round"><div class="bracket-round-header"><div class="bracket-round-title">'+label+'</div></div>';
     for(var m=0;m<matchesInRound;m++){
       var pa=getKOPlayer(ev,r,m,0);
       var pb=getKOPlayer(ev,r,m,1);
       var key='ko_r'+r+'_m'+m;
       var sc=ev.scores[key];
-      var aWon=sc&&sc.a>sc.b;
-      var bWon=sc&&sc.b>sc.a;
+      var aWon=sc&&sc.a>sc.b; var bWon=sc&&sc.b>sc.a;
       var aName=pa?pa.last+(pa.first?', '+pa.first:''):'TBD';
       var bName=pb?pb.last+(pb.first?', '+pb.first:''):'TBD';
       html+='<div class="bracket-match">';
-      html+='<div class="bracket-player'+(aWon?' winner':'')+'">';
-      html+=aName+(sc?' <span style="margin-left:auto;font-weight:700;color:'+(aWon?'var(--accent)':'var(--text-muted)')+'">'+sc.a+'</span>':'');
-      html+='</div>';
-      html+='<div class="bracket-player'+(bWon?' winner':'')+'">';
-      html+=bName+(sc?' <span style="margin-left:auto;font-weight:700;color:'+(bWon?'var(--accent)':'var(--text-muted)')+'">'+sc.b+'</span>':'');
-      html+='</div>';
+      html+='<div class="bracket-player'+(aWon?' winner':'')+'"><span>'+aName+'</span>'+(sc?'<span style="font-family:var(--font-head);font-weight:700;color:'+(aWon?'var(--accent2)':'var(--text-muted)')+'">'+sc.a+'</span>':'')+'</div>';
+      html+='<div class="bracket-player'+(bWon?' winner':'')+'"><span>'+bName+'</span>'+(sc?'<span style="font-family:var(--font-head);font-weight:700;color:'+(bWon?'var(--accent2)':'var(--text-muted)')+'">'+sc.b+'</span>':'')+'</div>';
       html+='</div>';
     }
-    // Champion display
     if(r===numRounds-1){
       var finalKey='ko_r'+(numRounds-1)+'_m0';
       var finalSc=ev.scores[finalKey];
       if(finalSc){
         var champ=finalSc.a>finalSc.b?getKOPlayer(ev,numRounds-1,0,0):getKOPlayer(ev,numRounds-1,0,1);
         if(champ){
-          html+='<div style="margin:10px;padding:12px;background:rgba(124,58,237,.15);border:1px solid var(--accent2);border-radius:var(--radius);text-align:center">';
-          html+='<div style="font-size:20px">🏆</div>';
-          html+='<div style="font-family:var(--font-head);font-size:16px;font-weight:700;color:var(--accent)">'+champ.last+(champ.first?', '+champ.first:'')+'</div>';
-          html+='<div style="font-size:11px;color:var(--text-dim);margin-top:2px">Champion</div></div>';
+          html+='<div style="margin:8px 10px;padding:12px;background:rgba(247,201,72,.08);border:1px solid rgba(247,201,72,.3);border-radius:var(--radius);text-align:center">';
+          html+='<div style="font-size:20px;margin-bottom:4px">🏆</div>';
+          html+='<div style="font-family:var(--font-head);font-size:14px;font-weight:800;color:var(--gold)">'+champ.last+(champ.first?', '+champ.first:'')+'</div>';
+          html+='<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;font-family:var(--font-head)">CHAMPION</div></div>';
         }
       }
     }
@@ -1206,10 +1318,7 @@ function printMatchSlips(){
   var evId=document.getElementById('print-event-slips').value;
   var evs=evId==='all'?state.events:state.events.filter(function(e){return e.id==evId;});
   var t=state.tournament;
-  var parts=['<html><head><title>Match Slips</title><style>'];
-  parts.push('body{font-family:sans-serif;font-size:12px}.slip{border:1px solid #333;padding:10px;margin:8px;display:inline-block;width:45%;vertical-align:top}');
-  parts.push('h3{margin:0 0 6px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #999;padding:4px;font-size:11px}');
-  parts.push('@media print{.slip{page-break-inside:avoid}}</style></head><body>');
+  var parts=['<html><head><title>Match Slips</title><style>body{font-family:sans-serif;font-size:12px}.slip{border:1px solid #333;padding:10px;margin:8px;display:inline-block;width:45%;vertical-align:top}h3{margin:0 0 6px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #999;padding:4px;font-size:11px}@media print{.slip{page-break-inside:avoid}}</style></head><body>'];
   evs.forEach(function(ev){
     if(!ev.draw||!ev.format.startsWith('rr'))return;
     ev.draw.forEach(function(grp,gi){
@@ -1250,102 +1359,17 @@ function printResults(){
 // ── TABS ──
 function switchTab(name){
   document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('nav button').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
   document.getElementById('tab-'+name).classList.add('active');
-  document.querySelector('nav button[data-tab="'+name+'"]').classList.add('active');
+  var navBtn=document.querySelector('.nav-item[data-tab="'+name+'"]');
+  if(navBtn)navBtn.classList.add('active');
   if(name==='standings')renderStandings();
   if(name==='bracket')renderBracket();
 }
-document.querySelectorAll('nav button').forEach(function(btn){
+document.querySelectorAll('.nav-item[data-tab]').forEach(function(btn){
   btn.onclick=function(){switchTab(btn.dataset.tab);};
 });
 
-// ── IMPORT FROM FIREBASE DATABASE ──
-function importFromDatabase() {
-  var btn = document.getElementById('import-db-btn');
-  var origText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = '⏳ Loading…';
-
-  var db = firebase.database();
-  db.ref('users').once('value')
-    .then(function(snapshot) {
-      var data = snapshot.val();
-      if (!data) {
-        alert('No users found in the database.');
-        btn.disabled = false;
-        btn.textContent = origText;
-        return;
-      }
-
-      var imported = 0;
-      var skipped = 0;
-
-      Object.values(data).forEach(function(user) {
-        // Only import active users
-        if (!user.status || user.status.toLowerCase() !== 'active') {
-          skipped++;
-          return;
-        }
-
-        // Parse name — try splitting "First Last" or use full name as last name
-        var firstName = '', lastName = '';
-        if (user.name) {
-          var parts = user.name.trim().split(/\s+/);
-          if (parts.length >= 2) {
-            firstName = parts[0];
-            lastName = parts.slice(1).join(' ');
-          } else {
-            lastName = parts[0];
-          }
-        }
-
-        // Skip if already exists (match by full name)
-        var fullName = (firstName + ' ' + lastName).trim().toLowerCase();
-        var exists = state.players.some(function(p) {
-          return (p.first + ' ' + p.last).trim().toLowerCase() === fullName;
-        });
-
-        if (exists) {
-          skipped++;
-          return;
-        }
-
-        state.players.push({
-          id: nextPlayerId++,
-          first: firstName,
-          last: lastName,
-          nick: user.nick || user.nickname || '',
-          team: user.team || user.club || '',
-          gender: user.gender || '',
-          rating: parseInt(user.rating) || 0
-        });
-        imported++;
-      });
-
-      save();
-      renderPlayers();
-      renderStatusBar();
-
-      btn.disabled = false;
-      btn.textContent = origText;
-
-      alert('Import complete!\n✅ ' + imported + ' active player' + (imported !== 1 ? 's' : '') + ' imported\n⏭ ' + skipped + ' skipped (inactive or already exists)');
-    })
-    .catch(function(err) {
-      btn.disabled = false;
-      btn.textContent = origText;
-      alert('Database error: ' + err.message);
-    });
-}
-
-
-// ── INIT ──
-function renderAll(){
-  loadSetupFields();renderPlayers();renderEvents();populateEventSelects();renderStatusBar();
-}
-loadData();
-renderAll();
 // ── FIREBASE AUTH ──
 var firebaseConfig = {
   apiKey: "AIzaSyCaMXtmVZAVWFDRo5xXWQOUMdJbXlcgstM",
@@ -1359,7 +1383,6 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 
-// Auth state: show login or app
 auth.onAuthStateChanged(function(user) {
   if (user) {
     document.getElementById('login-screen').style.display = 'none';
@@ -1371,49 +1394,46 @@ auth.onAuthStateChanged(function(user) {
 });
 
 function doLogin() {
-  var btn = document.getElementById('login-btn');
-  var errEl = document.getElementById('login-error');
-  var email = document.getElementById('login-email').value.trim();
-  var password = document.getElementById('login-password').value;
-  if (!email) { errEl.textContent = 'Please enter your email.'; return; }
-  if (!password) { errEl.textContent = 'Please enter your password.'; return; }
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-  errEl.textContent = '';
-  auth.signInWithEmailAndPassword(email, password)
-    .then(function() {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app-content').style.display = 'block';
+  var btn=document.getElementById('login-btn');
+  var errEl=document.getElementById('login-error');
+  var email=document.getElementById('login-email').value.trim();
+  var password=document.getElementById('login-password').value;
+  if(!email){errEl.textContent='Please enter your email.';return;}
+  if(!password){errEl.textContent='Please enter your password.';return;}
+  btn.disabled=true; btn.textContent='Signing in…'; errEl.textContent='';
+  auth.signInWithEmailAndPassword(email,password)
+    .then(function(){
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('app-content').style.display='block';
     })
-    .catch(function(error) {
-      errEl.textContent = error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential'
-        ? 'Incorrect password. Please try again.'
-        : error.code === 'auth/user-not-found'
-        ? 'No account found with that email.'
-        : error.code === 'auth/invalid-email'
-        ? 'Please enter a valid email address.'
-        : error.code === 'auth/too-many-requests'
-        ? 'Too many attempts. Please wait and try again.'
-        : 'Sign in failed: ' + error.message;
-      btn.disabled = false;
-      btn.textContent = 'Sign In';
+    .catch(function(error){
+      errEl.textContent=error.code==='auth/wrong-password'||error.code==='auth/invalid-credential'?'Incorrect password.'
+        :error.code==='auth/user-not-found'?'No account found with that email.'
+        :error.code==='auth/invalid-email'?'Please enter a valid email address.'
+        :error.code==='auth/too-many-requests'?'Too many attempts. Please wait.'
+        :'Sign in failed: '+error.message;
+      btn.disabled=false; btn.textContent='Sign In';
     });
 }
-
 function doLogout() {
-  auth.signOut().then(function() {
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('app-content').style.display = 'none';
-    document.getElementById('login-email').value = '';
-    document.getElementById('login-password').value = '';
-    document.getElementById('login-error').textContent = '';
-    document.getElementById('login-btn').disabled = false;
-    document.getElementById('login-btn').textContent = 'Sign In';
+  auth.signOut().then(function(){
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app-content').style.display='none';
+    document.getElementById('login-email').value='';
+    document.getElementById('login-password').value='';
+    document.getElementById('login-error').textContent='';
+    document.getElementById('login-btn').disabled=false;
+    document.getElementById('login-btn').textContent='Sign In';
   });
 }
 
+// ── INIT ──
+function renderAll(){
+  loadSetupFields();renderPlayers();renderEvents();populateEventSelects();renderStatusBar();
+}
+loadData();
+renderAll();
 </script>
 
-</div>
 </body>
 </html>
