@@ -10,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <style>    :root {
+  <sty    :root {
       --bg:#0a0e1a;
       --bg2:#111827;
       --bg3:#1a2235;
@@ -274,16 +274,48 @@
     ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
     ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
 
+    /* ── HAMBURGER BUTTON ── */
+    #menu-toggle{
+      display:none;
+      background:transparent;border:1px solid var(--border2);
+      color:var(--text-dim);border-radius:var(--radius);
+      padding:7px 9px;cursor:pointer;flex-shrink:0;
+      align-items:center;justify-content:center;
+    }
+    #menu-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;display:block}
+    #menu-toggle:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* ── SIDEBAR OVERLAY (mobile) ── */
+    #sidebar-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,.6);z-index:199;
+      backdrop-filter:blur(2px);
+    }
+    #sidebar-overlay.open{display:block}
+
     /* ── RESPONSIVE ── */
     @media(max-width:768px){
-      :root{--sidebar-w:0px}
-      #sidebar{display:none}
-      #content{padding:16px}
+      #menu-toggle{display:flex}
+      #sidebar{
+        position:fixed;top:0;left:-240px;bottom:0;
+        width:240px;z-index:200;
+        transition:left .25s ease;
+        padding-top:60px;
+        box-shadow:4px 0 24px rgba(0,0,0,.5);
+      }
+      #sidebar.open{left:0}
+      #content{padding:16px 14px}
       .form-grid{grid-template-columns:1fr 1fr}
+      .topbar-stat{display:none}
+      .topbar-divider{display:none}
+      .topbar-tournament{display:none}
     }
     @media(max-width:480px){
       .form-grid{grid-template-columns:1fr}
       .field.span2{grid-column:span 1}
+      #topbar{padding:0 14px}
+      .topbar-title{font-size:12px}
+      .btn-icon span{display:none}
     }
   </style>
 
@@ -322,6 +354,9 @@
 <!-- TOPBAR -->
 <div id="topbar">
   <div class="topbar-left">
+    <button id="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6" stroke-width="2"/><line x1="3" y1="12" x2="21" y2="12" stroke-width="2"/><line x1="3" y1="18" x2="21" y2="18" stroke-width="2"/></svg>
+    </button>
     <div class="topbar-logo">
       <div class="topbar-logo-icon">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M12 3 Q16 12 12 21" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M3 12 Q12 8 21 12" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
@@ -354,6 +389,9 @@
 </div>
 
 <div class="app-shell">
+
+<!-- SIDEBAR OVERLAY -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
@@ -1356,6 +1394,23 @@ function printResults(){
   var w=window.open('','_blank'); w.document.write(parts.join('')); w.print();
 }
 
+// ── SIDEBAR TOGGLE ──
+function toggleSidebar(){
+  var sidebar=document.getElementById('sidebar');
+  var overlay=document.getElementById('sidebar-overlay');
+  var isOpen=sidebar.classList.contains('open');
+  if(isOpen){ closeSidebar(); } else {
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
 // ── TABS ──
 function switchTab(name){
   document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
@@ -1367,7 +1422,11 @@ function switchTab(name){
   if(name==='bracket')renderBracket();
 }
 document.querySelectorAll('.nav-item[data-tab]').forEach(function(btn){
-  btn.onclick=function(){switchTab(btn.dataset.tab);};
+  btn.onclick=function(){
+    switchTab(btn.dataset.tab);
+    // Close sidebar on mobile after nav
+    if(window.innerWidth<=768) closeSidebar();
+  };
 });
 
 // ── FIREBASE AUTH ──
